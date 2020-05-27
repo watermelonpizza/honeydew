@@ -1,0 +1,41 @@
+﻿@page "/{id?}"
+@using Honeydew.Models
+@model Honeydew.Pages.UploadModel
+@{
+    ViewData["Title"] = "ViewUpload";
+    ViewData["HideHeader"] = true;
+}
+
+@if (Model.Upload == null)
+{
+    <h1>Nothing here!</h1>
+
+    return;
+}
+
+
+@if (Model.Upload.Status == UploadStatus.Pending)
+{
+    @section Head {
+        <meta http-equiv="refresh" content="1">
+    }
+
+    <h1>Your file is still uploading. Come back when it's done! :) The page will refresh until it's done.</h1>
+
+    return;
+}
+
+<div class="bg-white shadow-md">
+    <div class="upload-container">
+        <partial name="_UploadRenderPartial" model="new UploadRenderModel(Model.Upload)" />
+    </div>
+
+    <div class="">
+        <h1 class="p-2 text-lg">@Model.Upload.Name</h1>
+        <div class="flex items-end">
+            <a target="_blank" asp-controller="Upload" asp-action="Raw" asp-route-id="@Model.Upload.Id">
+                <img class="h-10" src="assets/eye.svg" />
+            </a>
+        </div>
+    </div>
+</div>

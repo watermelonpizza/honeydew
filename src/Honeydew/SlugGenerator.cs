@@ -27,13 +27,11 @@ namespace Honeydew
             {
                 // Generate a few at the current length then increase if still trying
                 // async doesn't do anything in this library. Just adds overhead here.
-                // ReSharper disable once MethodHasAsyncOverload
                 slug = Generate(_slugOptions.Alphabet, _slugOptions.Size + Math.Max(0, tries - 5));
 
                 // TODO: Issue with multiple uploads with the same key at the same time will cause one to error out (both save to upload staging table
                 var existingEntry = await _context.Uploads.FindAsync(new[] { slug }, cancellationToken);
 
-                // ReSharper disable once InvertIf
                 if (existingEntry != null)
                 {
                     slug = null;

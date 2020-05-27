@@ -9,11 +9,11 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Honeydew.Pages
 {
-    public class ViewUploadModel : PageModel
+    public class UploadModel : PageModel
     {
         private ApplicationDbContext _context;
 
-        public ViewUploadModel(ApplicationDbContext context)
+        public UploadModel(ApplicationDbContext context)
         {
             _context = context;
         }
@@ -23,8 +23,6 @@ namespace Honeydew.Pages
 
         public Upload Upload { get; set; }
 
-        public bool IsImage { get; set; }
-
         public bool IsVideo { get; set; }
 
         public string UploadUrl { get; set; }
@@ -32,8 +30,6 @@ namespace Honeydew.Pages
         public async Task OnGet()
         {
             Upload = await _context.Uploads.FindAsync(new[] { Id }, Request.HttpContext.RequestAborted);
-
-            IsImage = Upload?.ContentType?.StartsWith("image") ?? false;
         }
     }
 }

@@ -15630,9 +15630,32 @@ a[href] {
     color: #2b6cb0;
     color: rgba(43, 108, 176, var(--text-opacity)); }
 
-.brand {
-  font-size: 1.25rem;
-  color: #2d3748 !important; }
+header {
+  --bg-opacity: 1;
+  background-color: #44337a;
+  background-color: rgba(68, 51, 122, var(--bg-opacity));
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  border-bottom-width: 1px; }
+  header a[href] {
+    --text-opacity: 1;
+    color: #d6bcfa;
+    color: rgba(214, 188, 250, var(--text-opacity)); }
+    header a[href]:hover {
+      --text-opacity: 1;
+      color: #faf5ff;
+      color: rgba(250, 245, 255, var(--text-opacity)); }
+  header .brand {
+    font-size: 1.25rem;
+    color: #faf5ff !important; }
+
+.upload-container {
+  display: grid;
+  align-items: stretch;
+  align-content: stretch;
+  min-width: 50vw;
+  min-height: 50%;
+  max-height: 70vh;
+  max-width: 90vw; }
 
 @media (min-width: 640px) {
   .sm\:space-y-0 > :not(template) ~ :not(template) {

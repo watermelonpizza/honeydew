@@ -78,7 +78,6 @@ namespace Honeydew.UploadStores
             using var scope = _provider.CreateScope();
             await using var context = scope.ServiceProvider.GetService<ApplicationDbContext>();
 
-            // ReSharper disable once CoVariantArrayConversion
             var upload = await context.Uploads.FindAsync(new[] { fileId }, cancellationToken);
 
             var (bytesWrittenThisRequest, clientDisconnectedDuringRead) = await AppendToFile(
@@ -102,7 +101,6 @@ namespace Honeydew.UploadStores
             }
 
             // Don't want the user to be able to cancel
-            // ReSharper disable once MethodSupportsCancellation
             await context.SaveChangesAsync();
 
             return bytesWrittenThisRequest;
@@ -234,7 +232,6 @@ namespace Honeydew.UploadStores
             }
         }
 
-        // ReSharper disable once SuggestBaseTypeForParameter
         private static async Task FlushFileToDisk(
             byte[] fileWriteBuffer,
             FileStream fileStream,

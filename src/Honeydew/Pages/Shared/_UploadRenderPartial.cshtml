@@ -1,0 +1,46 @@
+﻿@model Honeydew.Models.UploadRenderModel
+
+@{
+    var url = $"/{Model.Id}/raw";
+}
+
+@switch (Model.MediaTypeCategory)
+{
+    case Models.MediaType.Application:
+
+        <object class="w-full" type="@Model.MediaType" data="@url"></object>
+
+        break;
+    case Models.MediaType.Audio:
+
+        <audio src="@url" controls></audio>
+
+        break;
+    case Models.MediaType.Font:
+        break;
+    case Models.MediaType.Image:
+
+        <div class="bg-no-repeat bg-center bg-contain" style="background-image: url(@url)"></div>
+
+        break;
+    case Models.MediaType.Model:
+
+
+        break;
+    case Models.MediaType.Text:
+
+        <iframe class="w-full border-0" src="@url"></iframe>
+
+        break;
+    case Models.MediaType.Video:
+
+        <video class="w-full" src="@url" controls></video>
+
+        break;
+    case Models.MediaType.UnknownOrNotSupported:
+    default:
+
+        <text>I don't know how to render this. Sorry :(</text>
+
+        break;
+}

@@ -1,5 +1,6 @@
 ﻿@page
 @using Microsoft.AspNetCore.Authorization
+@using Honeydew.Models
 @model IndexModel
 @attribute [Authorize]
 
@@ -7,4 +8,12 @@
     ViewData["Title"] = "Home page";
 }
 
-<partial name="_Upload" />
+<partial name="_Uploader" />
+
+<div>
+    @foreach (var upload in Model.UserUploads)
+    {
+        <partial name="_UploadRenderPartial" model="new UploadRenderModel(upload)" />
+        <a asp-page="Upload" asp-route-id="@upload.Id">@upload.Name</a>
+    }
+</div>

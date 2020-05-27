@@ -12,7 +12,8 @@ namespace Honeydew.Models
 
         public string Name { get; set; }
         public string Extension { get; set; }
-        public string ContentType { get; set; }
+        public string OriginalFileNameWithExtension { get; set; }
+        public string MediaType { get; set; }
 
         public long UploadedLength { get; set; }
         public long Length { get; set; }

@@ -21,7 +21,7 @@
                 // Attach additional meta data about the file for the server
                 metadata: {
                     name: file.name,
-                    contentType: file.type
+                    mediaType: file.type
                 },
                 // Callback for errors which cannot be fixed using retries
                 onError: function (error) {
@@ -38,7 +38,7 @@
                 },
                 onAfterResponse: function (req, res) {
                     const location = res.getHeader("Location");
-
+                    console.log(location);
                     const split = location.split('/');
                     const fileId = split[split.length - 1];
 

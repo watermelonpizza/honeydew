@@ -8,21 +8,23 @@
 
     @await RenderSectionAsync("Head", required: false)
 </head>
-<body class="bg-gray-100">
-    <header class="bg-white shadow border-b">
-        <nav class="flex items-center justify-between space-x-4 p-4">
-            <a class="brand" asp-area="" asp-page="/">Honeydew</a>
-            <partial name="_LoginPartial" />
-        </nav>
-    </header>
-    <main role="main" class="container p-4">
+<body class="h-screen flex flex-col bg-gray-100">
+    @if (!((ViewData["HideHeader"] is bool hide) && hide))
+    {
+        <header>
+            <nav class="flex items-center justify-between space-x-4 p-4">
+                <a class="brand" asp-area="" asp-page="/Index">Honeydew</a>
+                <partial name="_LoginPartial" />
+            </nav>
+        </header>
+    }
+
+    <main role="main" class="flex-grow mx-auto p-4">
         @RenderBody()
     </main>
 
-    <footer class="sticky bottom-1 border-t border-gray-400 text-gray-600">
-        <div class="container">
-            &copy; 2020 - Honeydew - <a asp-area="" asp-page="/Privacy">Privacy</a>
-        </div>
+    <footer class="flex items-center justify-center p-4 text-gray-600">
+        &copy; 2020 - Honeydew
     </footer>
 
     <script src="~/js/site.js" asp-append-version="true"></script>

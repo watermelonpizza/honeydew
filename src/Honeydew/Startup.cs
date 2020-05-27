@@ -18,6 +18,7 @@ using Honeydew.Models;
 using Honeydew.UploadStores;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -177,9 +178,9 @@ namespace Honeydew
                                 ctx.FailRequest("name metadata must be specified.");
                             }
 
-                            if (!ctx.Metadata.ContainsKey("contentType") || ctx.Metadata["contentType"].HasEmptyValue || string.IsNullOrWhiteSpace(ctx.Metadata["contentType"].GetString(Encoding.UTF8)))
+                            if (!ctx.Metadata.ContainsKey("mediaType") || ctx.Metadata["mediaType"].HasEmptyValue || string.IsNullOrWhiteSpace(ctx.Metadata["mediaType"].GetString(Encoding.UTF8)))
                             {
-                                ctx.FailRequest("contentType metadata must be specified.");
+                                ctx.FailRequest("mediaType metadata must be specified.");
                             }
 
                             return Task.CompletedTask;
@@ -189,7 +190,7 @@ namespace Honeydew
                             logger.LogInformation($"Created file {ctx.FileId} using {ctx.Store.GetType().FullName}");
 
                             var name = ctx.Metadata["name"].GetString(Encoding.UTF8);
-                            var contentType = ctx.Metadata["contentType"].GetString(Encoding.UTF8);
+                            var mediaType = ctx.Metadata["mediaType"].GetString(Encoding.UTF8);
 
                             var filename = Path.GetFileNameWithoutExtension(name);
                             var extension = Path.GetExtension(name);
@@ -212,7 +213,8 @@ namespace Honeydew
                                     Id = ctx.FileId,
                                     Name = filename,
                                     Extension = extension,
-                                    ContentType = contentType,
+                                    OriginalFileNameWithExtension = Path.GetFileName(name),
+                                    MediaType = mediaType,
                                     Length = ctx.UploadLength,
                                     Metadata = ctx.HttpContext.Request.Headers[HeaderConstants.UploadMetadata],
                                     UserId = userManager.GetUserId(ctx.HttpContext.User),
@@ -241,7 +243,6 @@ namespace Honeydew
                                     .ServiceProvider
                                     .GetService<ApplicationDbContext>();
 
-                            // ReSharper disable once CoVariantArrayConversion
                             var upload = await context.Uploads.FindAsync(ctx.FileId);
 
                             upload.Status = UploadStatus.Complete;
