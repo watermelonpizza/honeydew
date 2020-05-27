@@ -69,7 +69,7 @@ namespace Honeydew
 #if DEBUG
             if (Environment.IsDevelopment())
             {
-                //services.AddLiveReload();
+                services.AddLiveReload();
                 builder.AddRazorRuntimeCompilation();
             }
 #endif
@@ -85,7 +85,7 @@ namespace Honeydew
                 app.UseStatusCodePages();
 
 #if DEBUG
-                //app.UseLiveReload();
+                app.UseLiveReload();
 #endif
             }
             else
