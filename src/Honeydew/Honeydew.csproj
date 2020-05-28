@@ -30,10 +30,4 @@
     <PackageReference Include="Westwind.AspnetCore.LiveReload" Version="0.2.3" Condition="'$(Configuration)' == 'Debug'" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="storage\" />
-    <Folder Include="wwwroot\js\monaco\" />
-    <Folder Include="wwwroot\storage\" />
-  </ItemGroup>
-
 </Project>
