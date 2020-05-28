@@ -73,7 +73,7 @@ namespace Honeydew.Controllers
             var uploadFile =
                 await (_defaultTusConfiguration.Store as ITusReadableStore).GetFileAsync(id, Request.HttpContext.RequestAborted);
 
-            Response.Headers.Add("Content-Disposition", $"{contentDispositionType};{upload.Name + upload.Extension}");
+            Response.Headers.Add("Content-Disposition", $"{contentDispositionType};filename={upload.Name + upload.Extension}");
 
             if (MediaTypeHelpers.ParseMediaType(upload.MediaType) == MediaType.Text)
             {

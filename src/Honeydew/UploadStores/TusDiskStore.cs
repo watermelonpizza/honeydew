@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using tusdotnet.Interfaces;
 using tusdotnet.Models;
+using tusdotnet.Parsers;
 using tusdotnet.Stores;
 
 namespace Honeydew.UploadStores
@@ -57,7 +58,9 @@ namespace Honeydew.UploadStores
 
         public async Task<string> CreateFileAsync(long uploadLength, string metadata, CancellationToken cancellationToken)
         {
-            var parsedMetadata = Metadata.Parse(metadata);
+            var parsedMetadata = 
+                MetadataParser.ParseAndValidate(MetadataParsingStrategy.AllowEmptyValues, metadata)
+                    .Metadata;
 
             var name = parsedMetadata.FirstOrDefault(x => x.Key == "name").Value.GetString(Encoding.UTF8);
 

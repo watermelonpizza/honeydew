@@ -2,11 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-a[href] {
-  @apply text-blue-500;
+a[href],
+.link {
+  @apply text-purple-500;
 
   &:hover {
-    @apply text-blue-700;
+    @apply text-purple-700;
   }
 }
 
@@ -28,11 +29,23 @@ header {
 }
 
 .upload-container {
-  display: grid;
-  align-items: stretch;
-  align-content: stretch;
-  min-width: 50vw;
-  min-height: 50%;
-  max-height: 70vh;
-  max-width: 90vw;
+  @apply mt-4;
+  width: calc(100vw - theme('margin.8'));
+
+  @screen md {
+    @apply mt-16;
+    width: calc(100vw - theme('margin.32'));
+  }
+
+  @screen lg {
+    // Continue from the last breakpoint smoothly scaling up
+    min-width: calc((theme('screens.lg') - 1px) - theme('margin.32'));
+    width: 70vw;
+    max-width: theme('screens.xl');
+  }
+
+  & > *:first-child {
+    flex-grow: 1;
+    outline: none;
+  }
 }

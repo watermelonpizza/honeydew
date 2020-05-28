@@ -8,12 +8,39 @@
     ViewData["Title"] = "Home page";
 }
 
-<partial name="_Uploader" />
-
-<div>
-    @foreach (var upload in Model.UserUploads)
-    {
-        <partial name="_UploadRenderPartial" model="new UploadRenderModel(upload)" />
-        <a asp-page="Upload" asp-route-id="@upload.Id">@upload.Name</a>
-    }
+<div class="mb-12">
+    <partial name="_Uploader" />
 </div>
+
+<table>
+    <thead>
+        <tr>
+            <th>File</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var upload in Model.UserUploads)
+        {
+            <tr>
+                <td><a asp-page="Upload" asp-route-id="@upload.Id">@upload.Name</a></td>
+                <td>
+                    <div class="m-2 flex items-center md:justify-end">
+                        <button class="link px-2 border rounded mr-2" onclick="copyText(`@Url.PageLink("Upload", values: new { id = upload.Id })`)" title="Copy link">
+                            <span class="hidden lg:inline mr-2">Copy</span>
+                            <i class="fas fa-link"></i>
+                        </button>
+                        <a target="_blank" class="px-2 border rounded mr-2" asp-controller="Upload" asp-action="Raw" asp-route-id="@upload.Id" title="View raw file">
+                            <span class="hidden lg:inline mr-2">Raw</span>
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a target="_blank" class="px-2 border rounded" asp-controller="Upload" asp-action="Download" asp-route-id="@upload.Id" title="Download file">
+                            <span class="hidden lg:inline mr-2">Download</span>
+                            <i class="fas fa-download"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

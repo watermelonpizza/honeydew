@@ -15621,14 +15621,16 @@ video {
 .delay-1000 {
   transition-delay: 1000ms; }
 
-a[href] {
+a[href],
+.link {
   --text-opacity: 1;
-  color: #4299e1;
-  color: rgba(66, 153, 225, var(--text-opacity)); }
-  a[href]:hover {
+  color: #9f7aea;
+  color: rgba(159, 122, 234, var(--text-opacity)); }
+  a[href]:hover,
+  .link:hover {
     --text-opacity: 1;
-    color: #2b6cb0;
-    color: rgba(43, 108, 176, var(--text-opacity)); }
+    color: #6b46c1;
+    color: rgba(107, 70, 193, var(--text-opacity)); }
 
 header {
   --bg-opacity: 1;
@@ -15649,13 +15651,20 @@ header {
     color: #faf5ff !important; }
 
 .upload-container {
-  display: grid;
-  align-items: stretch;
-  align-content: stretch;
-  min-width: 50vw;
-  min-height: 50%;
-  max-height: 70vh;
-  max-width: 90vw; }
+  margin-top: 1rem;
+  width: calc(100vw - 2rem); }
+  @media (min-width: 768px) {
+    .upload-container {
+      margin-top: 4rem;
+      width: calc(100vw - 8rem); } }
+  @media (min-width: 1024px) {
+    .upload-container {
+      min-width: calc((1024px - 1px) - 8rem);
+      width: 70vw;
+      max-width: 1280px; } }
+  .upload-container > *:first-child {
+    flex-grow: 1;
+    outline: none; }
 
 @media (min-width: 640px) {
   .sm\:space-y-0 > :not(template) ~ :not(template) {

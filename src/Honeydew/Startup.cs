@@ -30,6 +30,8 @@ using tusdotnet.Models;
 using tusdotnet.Models.Configuration;
 using tusdotnet.Models.Expiration;
 using tusdotnet.Models.Concatenation;
+using System.Net.Mime;
+using Microsoft.AspNetCore.StaticFiles;
 #if DEBUG
 using Westwind.AspNetCore.LiveReload;
 #endif
@@ -70,7 +72,7 @@ namespace Honeydew
 #if DEBUG
             if (Environment.IsDevelopment())
             {
-                services.AddLiveReload();
+                //services.AddLiveReload();
                 builder.AddRazorRuntimeCompilation();
             }
 #endif
@@ -86,7 +88,7 @@ namespace Honeydew
                 app.UseStatusCodePages();
 
 #if DEBUG
-                app.UseLiveReload();
+                //app.UseLiveReload();
 #endif
             }
             else
@@ -153,6 +155,7 @@ namespace Honeydew
                 {
                     Store = store,
                     UrlPath = "/upload",
+                    MetadataParsingStrategy = MetadataParsingStrategy.AllowEmptyValues,
                     Events = new Events
                     {
                         OnAuthorizeAsync = ctx =>
@@ -178,11 +181,6 @@ namespace Honeydew
                                 ctx.FailRequest("name metadata must be specified.");
                             }
 
-                            if (!ctx.Metadata.ContainsKey("mediaType") || ctx.Metadata["mediaType"].HasEmptyValue || string.IsNullOrWhiteSpace(ctx.Metadata["mediaType"].GetString(Encoding.UTF8)))
-                            {
-                                ctx.FailRequest("mediaType metadata must be specified.");
-                            }
-
                             return Task.CompletedTask;
                         },
                         OnCreateCompleteAsync = async ctx =>
@@ -190,7 +188,7 @@ namespace Honeydew
                             logger.LogInformation($"Created file {ctx.FileId} using {ctx.Store.GetType().FullName}");
 
                             var name = ctx.Metadata["name"].GetString(Encoding.UTF8);
-                            var mediaType = ctx.Metadata["mediaType"].GetString(Encoding.UTF8);
+                            var mediaType = MediaTypeHelpers.GetMediaTypeFromMetadata(ctx.Metadata);
 
                             var filename = Path.GetFileNameWithoutExtension(name);
                             var extension = Path.GetExtension(name);

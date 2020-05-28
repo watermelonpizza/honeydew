@@ -25,17 +25,109 @@
     return;
 }
 
-<div class="bg-white shadow-md">
-    <div class="upload-container">
-        <partial name="_UploadRenderPartial" model="new UploadRenderModel(Model.Upload)" />
-    </div>
+@{
+    var url = $"/{Model.Id}/raw";
+}
 
-    <div class="">
-        <h1 class="p-2 text-lg">@Model.Upload.Name</h1>
-        <div class="flex items-end">
-            <a target="_blank" asp-controller="Upload" asp-action="Raw" asp-route-id="@Model.Upload.Id">
-                <img class="h-10" src="assets/eye.svg" />
+<div class="upload-container flex flex-col items-stretch bg-white shadow-md">
+    @switch (Model.MediaTypeCategory)
+    {
+        case Models.MediaType.Application:
+
+            <object class="w-full" type="@Model.Upload.MediaType" data="@url"></object>
+
+            break;
+        case Models.MediaType.Audio:
+
+            <audio src="@url" controls></audio>
+
+            break;
+        case Models.MediaType.Font:
+            break;
+        case Models.MediaType.Image:
+
+            <div class="bg-no-repeat bg-center bg-contain" style="background-image: url(@url)"></div>
+
+            break;
+        case Models.MediaType.Model:
+
+
+            break;
+        case Models.MediaType.Text:
+
+            <div id="monacoContainer" style="min-height: 70vh; max-height: 70vh;"></div>
+
+            break;
+        case Models.MediaType.Video:
+
+            <video class="w-full" src="@url" controls></video>
+
+            break;
+        case Models.MediaType.UnknownOrNotSupported:
+        default:
+
+            <div class="flex flex-col items-center" style="min-height: 300px; height: 60vh;">
+
+                <div class="flex-grow self-stretch m-12 md:m-16 bg-contain bg-center bg-no-repeat" style="background-image: url(/assets/undraw_blank_canvas_3rbb.svg);"></div>
+
+                <div class="m-8 text-red-800">
+                    Sorry, I don't know how to render this.
+                    <br />
+                    Please try viewing the raw file or downloading it.
+                </div>
+            </div>
+
+            break;
+    }
+
+    @{
+        var extraPadding =
+            Model.MediaTypeCategory == MediaType.UnknownOrNotSupported
+            || Model.MediaTypeCategory == MediaType.Text
+            ? "m-2 shadow"
+            : "";
+    }
+
+    <div class="flex items-center justify-between flex-wrap @extraPadding p-2">
+        <h1 class="m-2 text-lg">@Model.Upload.Name</h1>
+        <div class="m-2 flex items-center md:justify-end">
+            <button class="link px-2 border rounded mr-2" onclick="copyText(window.location)" title="Copy link">
+                <span class="hidden lg:inline mr-2">Copy</span>
+                <i class="fas fa-link"></i>
+            </button>
+            <a target="_blank" class="px-2 border rounded mr-2" asp-controller="Upload" asp-action="Raw" asp-route-id="@Model.Upload.Id" title="View raw file">
+                <span class="hidden lg:inline mr-2">Raw</span>
+                <i class="fas fa-eye"></i>
+            </a>
+            <a target="_blank" class="px-2 border rounded" asp-controller="Upload" asp-action="Download" asp-route-id="@Model.Upload.Id" title="Download file">
+                <span class="hidden lg:inline mr-2">Download</span>
+                <i class="fas fa-download"></i>
             </a>
         </div>
     </div>
 </div>
+
+@if (Model.MediaTypeCategory == MediaType.Text)
+{
+    @section Scripts {
+        <script src="~/js/monaco/loader.js"></script>
+        <script>
+            require.config({ paths: { 'vs': '/js/monaco/' } });
+
+            require(['vs/editor/editor.main'], function () {
+                fetch('@url')
+                    .then(async res => {
+                        const text = await res.text();
+                        monaco.editor.create(document.getElementById('monacoContainer'), {
+                            value: text,
+                            minimap: {
+                                enabled: false
+                            },
+                            automaticLayout: true
+                        });
+                    })
+                    .catch(err => console.error(err));
+            });
+        </script>
+    }
+}

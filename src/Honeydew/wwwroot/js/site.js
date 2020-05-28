@@ -1,4 +1,43 @@
-﻿// Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
+﻿function fallbackCopyTextToClipboard(text, onComplete, onError) {
+  const textArea = document.createElement("textarea");
+  textArea.value = text;
 
-// Write your Javascript code.
+  // Avoid scrolling to bottom
+  textArea.style.top = "0";
+  textArea.style.left = "0";
+  textArea.style.position = "fixed";
+
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+
+  try {
+    const successful = document.execCommand('copy');
+
+    if (successful) {
+      onComplete && onComplete();
+    } else {
+      onError && onError('Copy to clipboard failed for unknown reasons');
+    }
+  } catch (err) {
+    console.error('Failed to copy text', text, err);
+    onError && onError(err);
+  }
+
+  document.body.removeChild(textArea);
+}
+
+function copyText(text, onComplete, onError) {
+  if (!navigator.clipboard) {
+    fallbackCopyTextToClipboard(text);
+    return;
+  }
+
+  navigator.clipboard.writeText(text)
+    .then(() => onComplete && onComplete())
+    .catch(reason => {
+      console.error('Failed to copy text', text, reason);
+
+      onError && onError(reason)
+    });
+}

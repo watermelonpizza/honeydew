@@ -19,7 +19,7 @@
         </header>
     }
 
-    <main role="main" class="flex-grow mx-auto p-4">
+    <main role="main" class="flex-grow mx-auto">
         @RenderBody()
     </main>
 
@@ -28,6 +28,7 @@
     </footer>
 
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/js/all.min.js" integrity="sha256-KzZiKy0DWYsnwMF+X1DvQngQ2/FxF7MF3Ff72XcpuPs=" crossorigin="anonymous"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

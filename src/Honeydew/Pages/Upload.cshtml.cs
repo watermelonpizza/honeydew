@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Honeydew.Data;
 using Honeydew.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using tusdotnet.Models;
 
 namespace Honeydew.Pages
 {
@@ -23,9 +21,7 @@ namespace Honeydew.Pages
 
         public Upload Upload { get; set; }
 
-        public bool IsVideo { get; set; }
-
-        public string UploadUrl { get; set; }
+        public MediaType MediaTypeCategory => MediaTypeHelpers.ParseMediaType(Upload.MediaType);
 
         public async Task OnGet()
         {
