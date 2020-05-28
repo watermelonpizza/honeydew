@@ -1,4 +1,5 @@
-﻿@tailwind base;
+﻿@use "sass:color";
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -27,6 +28,31 @@ header {
     color: theme('textColor.purple.100') !important;
   }
 }
+
+select {
+  &.form-select {
+    @apply block w-full h-8 px-2 py-0 text-sm;
+
+    &.loading {
+      @apply bg-purple-200;
+      background-repeat: repeat;
+      background-size: theme('height.8');
+      background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);
+      animation: loading 1s linear infinite;
+    }
+  }
+}
+
+@keyframes loading {
+  from {
+    background-position: theme('height.8') 0;
+  }
+
+  to {
+    background-position: 0 0;
+  }
+}
+
 
 .upload-container {
   @apply mt-4;

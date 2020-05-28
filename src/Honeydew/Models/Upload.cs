@@ -16,6 +16,14 @@ namespace Honeydew.Models
 
         public string MediaType { get; set; }
 
+        /// <summary>
+        /// Only relevant for text mime type displays for monaco editor to render in.
+        /// Must match the extact string that monaco knows about.
+        /// List of languages supported here: https://github.com/microsoft/monaco-languages/tree/master/src
+        /// </summary>
+        [MaxLength(25)]
+        public string CodeLanguage { get; set; }
+
         public long UploadedLength { get; set; }
         public long Length { get; set; }
 

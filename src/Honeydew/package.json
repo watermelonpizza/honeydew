@@ -4,10 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "postcss src/scss/tailwind.scss -o src/scss/tailwind.transform.scss --verbose & node-sass src/scss/tailwind.transform.scss wwwroot/css/site.css",
+    "build": "postcss src/scss/tailwind.scss -o src/scss/tailwind.transform.scss --verbose & node node_modules/dart-sass/sass.js src/scss/tailwind.transform.scss wwwroot/css/site.css",
     "watch": "concurrently \"npm:watch:*\"",
     "watch:src": "postcss src/scss/tailwind.scss -o src/scss/tailwind.transform.scss --verbose --watch",
-    "watch:transform": "node-sass src/scss/tailwind.transform.scss wwwroot/css/site.css -w"
+    "watch:transform": "node node_modules/dart-sass/sass.js src/scss/tailwind.transform.scss wwwroot/css/site.css --watch"
   },
   "keywords": [],
   "author": "",
@@ -17,7 +17,7 @@
     "autoprefixer": "^9.8.0",
     "concurrently": "^5.2.0",
     "cross-env": "^7.0.2",
-    "node-sass": "^4.14.1",
+    "dart-sass": "^1.25.0",
     "postcss": "^7.0.30",
     "postcss-cli": "^7.1.1",
     "postcss-scss": "^2.1.1",

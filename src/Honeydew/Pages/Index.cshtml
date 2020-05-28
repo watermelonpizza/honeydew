@@ -1,6 +1,5 @@
 ﻿@page
 @using Microsoft.AspNetCore.Authorization
-@using Honeydew.Models
 @model IndexModel
 @attribute [Authorize]
 
@@ -17,6 +16,7 @@
         <tr>
             <th>File</th>
             <th></th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -24,6 +24,16 @@
         {
             <tr>
                 <td><a asp-page="Upload" asp-route-id="@upload.Id">@upload.Name</a></td>
+                <td>
+                    @if (MediaTypeHelpers.ParseMediaType(upload.MediaType) == MediaType.Text)
+                    {
+                        <select class="form-select"
+                                name="CodeLanguage"
+                                asp-items="CodeLanguageHelper.GetLanguages(upload.CodeLanguage)"
+                                onchange="updateCodeLanguage(`@Url.Action("PatchUpload", "Upload", new { id = upload.Id })`, this)">
+                        </select>
+                    }
+                </td>
                 <td>
                     <div class="m-2 flex items-center md:justify-end">
                         <button class="link px-2 border rounded mr-2" onclick="copyText(`@Url.PageLink("Upload", values: new { id = upload.Id })`)" title="Copy link">
@@ -44,3 +54,29 @@
         }
     </tbody>
 </table>
+
+@section Scripts {
+    <script>
+        function updateCodeLanguage(url, select) {
+            const codeLanguage = select.value;
+
+            select.disabled = true;
+            select.classList.add('loading');
+
+            fetch(url, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ @nameof(PatchUploadModel.CodeLanguage): codeLanguage })
+            })
+                .then(() => {
+                })
+                .catch(err => console.log(err))
+                .finally(() => {
+                    select.disabled = false;
+                    select.classList.remove('loading');
+                });
+        }
+    </script>
+}

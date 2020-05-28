@@ -88,7 +88,7 @@
             : "";
     }
 
-    <div class="flex items-center justify-between flex-wrap @extraPadding p-2">
+    <div class="flex items-center justify-between flex-wrap @extraPadding px-2 py-1">
         <h1 class="m-2 text-lg">@Model.Upload.Name</h1>
         <div class="m-2 flex items-center md:justify-end">
             <button class="link px-2 border rounded mr-2" onclick="copyText(window.location)" title="Copy link">
@@ -120,6 +120,7 @@
                         const text = await res.text();
                         monaco.editor.create(document.getElementById('monacoContainer'), {
                             value: text,
+                            language: `@Model.Upload.CodeLanguage`,
                             minimap: {
                                 enabled: false
                             },

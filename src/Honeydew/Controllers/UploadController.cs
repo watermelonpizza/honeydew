@@ -8,7 +8,10 @@ using Honeydew.Models;
 using Honeydew.UploadStores;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Logging.EventLog;
 using tusdotnet.Interfaces;
 using tusdotnet.Models;
@@ -21,12 +24,14 @@ namespace Honeydew.Controllers
         private readonly IStreamStore _streamStore;
         private readonly DefaultTusConfiguration _defaultTusConfiguration;
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<User> _userManager;
 
-        public UploadController(IStreamStore streamStore, DefaultTusConfiguration defaultTusConfiguration, ApplicationDbContext context)
+        public UploadController(IStreamStore streamStore, DefaultTusConfiguration defaultTusConfiguration, ApplicationDbContext context, UserManager<User> userManager)
         {
             _streamStore = streamStore;
             _defaultTusConfiguration = defaultTusConfiguration;
             _context = context;
+            _userManager = userManager;
         }
 
         [HttpPost]
@@ -44,6 +49,38 @@ namespace Honeydew.Controllers
             await _streamStore.WriteAllBytesAsync(filename, Request.Body, Request.HttpContext.RequestAborted);
 
             return Ok();
+        }
+
+        [HttpPatch]
+        [Authorize]
+        [Route("api/upload/{id}")]
+        public async Task<IActionResult> PatchUpload(string id, PatchUploadModel uploadPatch)
+        {
+            var userId = _userManager.GetUserId(User);
+
+            var upload = await _context.Uploads
+                .FirstOrDefaultAsync(
+                    x => x.Id == id && x.UserId == userId,
+                    Request.HttpContext.RequestAborted);
+
+            if (upload == null)
+            {
+                return NotFound();
+            }
+
+            if (!string.IsNullOrWhiteSpace(uploadPatch.Name))
+            {
+                upload.Name = uploadPatch.Name;
+            }
+
+            if (!string.IsNullOrWhiteSpace(uploadPatch.CodeLanguage))
+            {
+                upload.CodeLanguage = uploadPatch.CodeLanguage;
+            }
+
+            await _context.SaveChangesAsync(Request.HttpContext.RequestAborted);
+
+            return NoContent();
         }
 
         [HttpGet]

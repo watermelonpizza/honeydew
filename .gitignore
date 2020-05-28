@@ -363,6 +363,9 @@ FodyWeavers.xsd
 # Temporarily transformed scss file
 *.transform.scss
 
+# Compiled css files
+wwwroot/css/*
+
 # Sqlite files
 *.db
 
