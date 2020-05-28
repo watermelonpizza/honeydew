@@ -29,17 +29,37 @@ header {
   }
 }
 
-select {
-  &.form-select {
-    @apply block w-full h-8 px-2 py-0 text-sm;
+.form-input,
+.form-select {
+  @apply block w-full h-8 px-2 py-0 text-sm;
+}
 
-    &.loading {
-      @apply bg-purple-200;
-      background-repeat: repeat;
-      background-size: theme('height.8');
-      background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);
-      animation: loading 1s linear infinite;
+.form-group {
+  @apply flex;
+
+  .form-input {
+    @apply border-r-0 rounded-r-none border-gray-200;
+
+    outline: none !important;
+
+    &:focus,
+    &:active {
+      @apply border-gray-400;
     }
+  }
+
+  .form-attachment {
+    @apply h-8 px-2 flex items-center text-sm border-t border-r border-b rounded rounded-l-none bg-gray-100 text-gray-600;
+  }
+}
+
+input, select {
+  &.loading {
+    @apply bg-purple-200;
+    background-repeat: repeat;
+    background-size: theme('height.8');
+    background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);
+    animation: loading 1s linear infinite;
   }
 }
 

@@ -11,49 +11,45 @@
     <partial name="_Uploader" />
 </div>
 
-<table>
-    <thead>
-        <tr>
-            <th>File</th>
-            <th></th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
+<div class="p-4">
+    <h1 class="text-lg mb-8">Your files</h1>
+
+    <div class="space-y-4">
         @foreach (var upload in Model.UserUploads)
         {
-            <tr>
-                <td><a asp-page="Upload" asp-route-id="@upload.Id">@upload.Name</a></td>
-                <td>
+            var link = Url.PageLink("Upload", values: new { id = upload.Id });
+            var patchLink = Url.Action("PatchUpload", "Upload", new { id = upload.Id });
+
+            <div class="p-4 mx-auto max-w-3xl sm:flex items-start justify-between shadow hover:shadow-lg transform transition-all duration-100 ease-in-out hover:-translate-y-1 rounded bg-white">
+                <div class="flex-grow mb-4 sm:mb-0 sm:mr-8">
+                    <div class="form-group mb-4">
+                        <input class="form-input" value="@upload.Name" onchange="updateName(`@patchLink`, this)" autocomplete="off" spellcheck="false" />
+                        <label class="form-attachment">@upload.Extension</label>
+                    </div>
+
+                    <a class="h-full" asp-page="Upload" asp-route-id="@upload.Id">@link</a>
+                </div>
+
+                <div class="flex sm:block items-stretch sm:justify-end">
                     @if (MediaTypeHelpers.ParseMediaType(upload.MediaType) == MediaType.Text)
                     {
-                        <select class="form-select"
+                        <select class="sm:w-full form-select mr-2 sm:mr-0 sm:mb-2"
                                 name="CodeLanguage"
                                 asp-items="CodeLanguageHelper.GetLanguages(upload.CodeLanguage)"
-                                onchange="updateCodeLanguage(`@Url.Action("PatchUpload", "Upload", new { id = upload.Id })`, this)">
+                                onchange="updateCodeLanguage(`@patchLink`, this)">
                         </select>
                     }
-                </td>
-                <td>
-                    <div class="m-2 flex items-center md:justify-end">
-                        <button class="link px-2 border rounded mr-2" onclick="copyText(`@Url.PageLink("Upload", values: new { id = upload.Id })`)" title="Copy link">
-                            <span class="hidden lg:inline mr-2">Copy</span>
-                            <i class="fas fa-link"></i>
-                        </button>
-                        <a target="_blank" class="px-2 border rounded mr-2" asp-controller="Upload" asp-action="Raw" asp-route-id="@upload.Id" title="View raw file">
-                            <span class="hidden lg:inline mr-2">Raw</span>
-                            <i class="fas fa-eye"></i>
-                        </a>
-                        <a target="_blank" class="px-2 border rounded" asp-controller="Upload" asp-action="Download" asp-route-id="@upload.Id" title="Download file">
-                            <span class="hidden lg:inline mr-2">Download</span>
-                            <i class="fas fa-download"></i>
-                        </a>
-                    </div>
-                </td>
-            </tr>
+                    else
+                    {
+                        <span class="flex-grow"></span>
+                    }
+
+                    <partial name="_UploadActionButtons" model="upload" />
+                </div>
+            </div>
         }
-    </tbody>
-</table>
+    </div>
+</div>
 
 @section Scripts {
     <script>
@@ -63,19 +59,25 @@
             select.disabled = true;
             select.classList.add('loading');
 
-            fetch(url, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ @nameof(PatchUploadModel.CodeLanguage): codeLanguage })
-            })
-                .then(() => {
-                })
+             patch(url, { @nameof(PatchUploadModel.CodeLanguage): codeLanguage })
                 .catch(err => console.log(err))
                 .finally(() => {
-                    select.disabled = false;
-                    select.classList.remove('loading');
+                    input.disabled = false;
+                    input.classList.remove('loading');
+                });
+        }
+
+        function updateName(url, input) {
+            const value = input.value;
+
+            input.disabled = true;
+            input.classList.add('loading');
+
+            patch(url, { @nameof(PatchUploadModel.Name): value })
+                .catch(err => console.log(err))
+                .finally(() => {
+                    input.disabled = false;
+                    input.classList.remove('loading');
                 });
         }
     </script>

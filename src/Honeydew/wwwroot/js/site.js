@@ -41,3 +41,14 @@ function copyText(text, onComplete, onError) {
       onError && onError(reason)
     });
 }
+
+
+async function patch(url, data) {
+  return fetch(url, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  });
+}
