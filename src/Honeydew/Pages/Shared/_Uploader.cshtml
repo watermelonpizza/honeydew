@@ -1,4 +1,28 @@
-﻿<input id="fileInput" type="file" />
+﻿<noscript class="block border-l-4 border-red-500 p-4 m-4 text-lg bg-red-200 text-red-500">Javascript is required to upload</noscript>
+
+<div class="upload-bar p-2 md:p-4 m-4 flex items-center rounded bg-purple-600 text-purple-100">
+    <input id="fileInput" type="file" name="files" class="absolute opacity-0" style="z-index:-1;" />
+    <label for="fileInput" class="file-input-select-button mr-6 md:mr-0 inline-block pl-3 md:pl-4 cursor-pointer whitespace-no-wrap">
+        <i class="mr-3 md:mr-4 fas fa-magic"></i>
+        <span class="uppercase tracking-normal md:tracking-widest whitespace-no-wrap">
+            <span class="hidden md:inline">Start the magic</span>
+            <span class="md:hidden">Upload</span>
+        </span>
+    </label>
+
+    <div class="hidden md:flex items-center font-thin mx-10">
+        <span class="upload-or-left-chevron">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-left"><polyline points="11 17 6 12 11 7"></polyline><polyline points="18 17 13 12 18 7"></polyline></svg>
+        </span>
+        <span class="mx-3">OR</span>
+        <span class="upload-or-right-chevron">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-right"><polyline points="13 17 18 12 13 7"></polyline><polyline points="6 17 11 12 6 7"></polyline></svg>
+        </span>
+    </div>
+
+    <input class="flex-grow min-w-0 px-4 py-2 bg-purple-500 text-purple-100 placeholder-purple-200 focus:bg-purple-100 focus:text-purple-700 outline-none" placeholder="Paste a url" autocomplete="off" spellcheck="false" />
+
+</div>
 
 <script src="https://unpkg.com/tus-js-client@2.1.1/./dist/tus.min.js"></script>
 
@@ -6,7 +30,56 @@
     <a id="fileUrlLink" href=""></a>
 </div>
 
+<style>
+    .box__dragndrop,
+    .box__uploading,
+    .box__success,
+    .box__error {
+        display: none;
+    }
+
+    .box.has-advanced-upload {
+        background-color: white;
+        outline: 2px dashed black;
+        outline-offset: -10px;
+    }
+
+        .box.has-advanced-upload .box__dragndrop {
+            display: inline;
+        }
+</style>
+
 <script>
+    //const $form = document.getElementById('uploadForm');
+    //var isAdvancedUpload = function () {
+    //    var div = document.createElement('div');
+    //    return (('draggable' in div) || ('ondragstart' in div && 'ondrop' in div)) && 'FormData' in window && 'FileReader' in window;
+    //}();
+
+    //if (isAdvancedUpload) {
+    //    // ...
+    //    document.body.classList.add
+    //    $form.classList.add('has-advanced-upload');
+
+    //    $form.addEventListener('dragover dragenter', () => {
+    //        $form.classList.add('is-dragover');
+    //    });
+
+    //    $form.addEventListener('dragleave dragend drop', () => {
+    //        $form.classList.remove('is-dragover');
+    //    });
+
+    //    $form.addEventListener('drop', (e) => {
+    //        droppedFiles = e.originalEvent.dataTransfer.files;
+    //    });
+
+    //    $form.addEventListener('drag dragstart dragend dragover dragenter dragleave drop', (e) => {
+    //        e.preventDefault();
+    //        e.stopPropagation();
+    //    });
+
+    //}
+
     document.getElementById('fileInput')
         .addEventListener('change', function (e) {
             // Get the selected file from the input element

@@ -30,8 +30,6 @@ using tusdotnet.Models;
 using tusdotnet.Models.Configuration;
 using tusdotnet.Models.Expiration;
 using tusdotnet.Models.Concatenation;
-using System.Net.Mime;
-using Microsoft.AspNetCore.StaticFiles;
 #if DEBUG
 using Westwind.AspNetCore.LiveReload;
 #endif

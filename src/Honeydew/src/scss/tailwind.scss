@@ -39,7 +39,6 @@ header {
 
   .form-input {
     @apply border-r-0 rounded-r-none border-gray-200;
-
     outline: none !important;
 
     &:focus,
@@ -93,5 +92,58 @@ input, select {
   & > *:first-child {
     flex-grow: 1;
     outline: none;
+  }
+}
+
+.file-input-select-button {
+  &:hover {
+    animation: bounce .2s ease-in infinite;
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.update-or-left-chevron,
+.update-or-right-chevron {
+  display: inline-block;
+}
+
+.upload-bar {
+  &:hover {
+    .upload-or-left-chevron {
+      animation: animate-bounce-left .2s ease-in-out 2;
+    }
+
+    .upload-or-right-chevron {
+      animation: animate-bounce-right .2s ease-in-out 2;
+    }
+  }
+}
+
+@keyframes animate-bounce-left {
+  0%, 100% {
+    transform: translateX(0);
+  }
+
+  50% {
+    transform: translateX(-5px);
+  }
+}
+
+@keyframes animate-bounce-right {
+  0%, 100% {
+    transform: translateX(0);
+  }
+
+  50% {
+    transform: translateX(5px);
   }
 }

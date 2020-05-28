@@ -20,14 +20,38 @@
 
     @if (Model.Upload.Status == UploadStatus.Pending)
     {
+        var random = new System.Security.Cryptography.RNGCryptoServiceProvider();
+        var bytes = new byte[60 * 60];
+        random.GetBytes(bytes);
+
         @section Head {
             <meta http-equiv="refresh" content="1">
         }
 
         <div class="my-16 text-center">
-            <h1 class="mx-16 text-2xl text-gray-600">A little too eager there.</h1>
-            <div>
-                I'm still ingesting the bits. Beep boop beep 00010111010100100100101110. The page will refresh until it's done.
+            <h1 class="text-2xl mb-4">A little too eager there.</h1>
+            <div class="mb-2 text-gray-600">
+                I'm still ingesting the bits. <span class="text-purple-500">Beep beep boop.</span>
+            </div>
+
+            <div class="">
+                @for (int i = 0; i < 15; i++)
+                {
+                    <code class="block">
+                        @for (int j = 0; j < 30; j++)
+                        {
+                            var yes = bytes[i + (j * 15)] > 128;
+                            var two = bytes[i + (j * 15)] > 254 && bytes[i + (j * 15) + 1] > 245;
+
+                            <span class="leading-1 inline-block @(two ? "text-red-500 font-bold" : (yes ? "text-gray-800": "text-gray-600"))">@(two ? "2" : (yes ? "1" : "0"))</span>
+                        }
+                    </code>
+                }
+            </div>
+
+
+            <div class="mt-10 text-gray-500">
+                The page will refresh until it's done.
             </div>
         </div>
 
