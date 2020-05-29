@@ -7,13 +7,11 @@
     ViewData["Title"] = "Home page";
 }
 
-<div class="mb-8">
+<div class="mb-4">
     <partial name="_Uploader" />
 </div>
 
 <div class="p-4">
-    <h1 class="text-lg mb-8">Your files</h1>
-
     <div class="space-y-4">
         @foreach (var upload in Model.UserUploads)
         {

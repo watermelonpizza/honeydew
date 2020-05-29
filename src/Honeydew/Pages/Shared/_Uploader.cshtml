@@ -20,7 +20,7 @@
         </span>
     </div>
 
-    <input class="flex-grow min-w-0 px-4 py-2 bg-purple-500 text-purple-100 placeholder-purple-200 focus:bg-purple-100 focus:text-purple-700 outline-none" placeholder="Paste a url" autocomplete="off" spellcheck="false" />
+    <input class="flex-grow min-w-0 px-4 py-2 bg-purple-500 text-purple-100 placeholder-purple-200 focus:bg-purple-100 focus:text-purple-700 outline-none" placeholder="Paste a url (not implemented yet)" autocomplete="off" spellcheck="false" />
 
 </div>
 
@@ -111,17 +111,19 @@
                 },
                 onAfterResponse: function (req, res) {
                     const location = res.getHeader("Location");
-                    console.log(location);
-                    const split = location.split('/');
-                    const fileId = split[split.length - 1];
 
-                    document.getElementById('fileUrl').classList.remove('hidden');
+                    if (location) {
+                        const split = location.split('/');
+                        const fileId = split[split.length - 1];
 
-                    const anchor = document.getElementById('fileUrlLink');
-                    anchor.href = `/${fileId}`;
+                        document.getElementById('fileUrl').classList.remove('hidden');
 
-                    console.log(file);
-                    anchor.innerText = file.name;
+                        const anchor = document.getElementById('fileUrlLink');
+                        anchor.href = `/${fileId}`;
+
+                        console.log(file);
+                        anchor.innerText = file.name;
+                    }
                 }
             });
 
