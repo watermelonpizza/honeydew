@@ -30,6 +30,7 @@ using tusdotnet.Models;
 using tusdotnet.Models.Configuration;
 using tusdotnet.Models.Expiration;
 using tusdotnet.Models.Concatenation;
+using Honeydew.Tasks;
 #if DEBUG
 using Westwind.AspNetCore.LiveReload;
 #endif
@@ -64,6 +65,9 @@ namespace Honeydew
             CreateUploadHandlers(services);
 
             services.Configure<SlugOptions>(Configuration.GetSection("SlugGeneration"));
+            services.Configure<DeletionOptions>(Configuration.GetSection("Deletion"));
+
+            services.AddHostedService<DeletionCleanupTask>();
 
             var builder = services.AddRazorPages();
 

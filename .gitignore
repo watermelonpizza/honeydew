@@ -368,6 +368,8 @@ FodyWeavers.xsd
 
 # Sqlite files
 *.db
+*.db-wal
+*.db-shm
 
 # Default storage/cache directories
 storage/

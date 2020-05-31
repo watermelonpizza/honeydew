@@ -3,6 +3,7 @@ using Honeydew.Data;
 using Honeydew.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using tusdotnet.Models;
 
 namespace Honeydew.Pages
@@ -25,7 +26,8 @@ namespace Honeydew.Pages
 
         public async Task OnGet()
         {
-            Upload = await _context.Uploads.FindAsync(new[] { Id }, Request.HttpContext.RequestAborted);
+            Upload = await _context.Uploads
+                .FirstOrDefaultAsync(x => x.Id == Id && !x.PendingForDeletionAt.HasValue, Request.HttpContext.RequestAborted);
         }
     }
 }

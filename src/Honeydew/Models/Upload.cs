@@ -37,11 +37,15 @@ namespace Honeydew.Models
         // This has a value converter to string in the database.
         public UploadStatus Status { get; set; }
 
+        // This gives a grace period for deletions (if the user hits delete, but decides against later)
+        // i.e. an "undo" button.
+        public DateTimeOffset? PendingForDeletionAt { get; set; }
+
         public string UserId { get; set; }
         public User User { get; set; }
 
         public string CreatedBy { get; set; }
-        public DateTime CreatedUtc { get; set; } = DateTime.UtcNow;
+        public DateTimeOffset CreatedUtc { get; set; } = DateTimeOffset.UtcNow;
 
     }
 }

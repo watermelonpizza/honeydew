@@ -25,5 +25,6 @@
   },
   "dependencies": {
     "monaco-editor": "^0.20.0"
-  }
+  },
+  "-vs-binding": { "ProjectOpened": [ "watch" ] }
 }

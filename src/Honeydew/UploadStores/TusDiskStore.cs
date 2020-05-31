@@ -17,7 +17,7 @@ using tusdotnet.Stores;
 
 namespace Honeydew.UploadStores
 {
-    public class TusDiskStore : ITusStore, ITusCreationStore, ITusReadableStore
+    public class TusDiskStore : IHoneydewTusStore
     {
         private readonly IServiceProvider _provider;
         private readonly string _cachePath;
@@ -151,6 +151,16 @@ namespace Honeydew.UploadStores
             await using var context = scope.ServiceProvider.GetService<ApplicationDbContext>();
 
             return (await context.Uploads.FindAsync(new[] { fileId }, cancellationToken))?.UploadedLength ?? 0;
+        }
+
+        public async Task DeleteFileAsync(string fileId, CancellationToken cancellationToken)
+        {
+            using var scope = _provider.CreateScope();
+            await using var context = scope.ServiceProvider.GetService<ApplicationDbContext>();
+
+            var upload = await context.Uploads.FindAsync(new[] { fileId }, cancellationToken);
+
+            File.Delete(Path.Combine(_storagePath, fileId + upload.Extension));
         }
 
         private async Task<(long bytesRead, bool clientDisconnectedDuringRead)> AppendToFile(

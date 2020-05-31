@@ -1,16 +1,11 @@
 ﻿@model Upload
 
-<div class="flex items-stretch h-100">
-    <button class="link flex items-center h-8 px-2 border rounded mr-2" onclick="copyText(`@Url.PageLink("Upload", values: new { id = Model.Id })`)" title="Copy link">
-        <span class="hidden lg:inline mr-2">Copy</span>
-        <i class="fas fa-link"></i>
-    </button>
-    <a target="_blank" class="flex items-center h-8 px-2 border rounded mr-2" asp-controller="Upload" asp-action="Raw" asp-route-id="@Model.Id" title="View raw file">
-        <span class="hidden lg:inline mr-2">Raw</span>
-        <i class="fas fa-eye"></i>
-    </a>
-    <a target="_blank" class="flex items-center h-8 px-2 border rounded" asp-controller="Upload" asp-action="Download" asp-route-id="@Model.Id" title="Download file">
-        <span class="hidden lg:inline mr-2">Download</span>
-        <i class="fas fa-download"></i>
-    </a>
-</div>
+<button class="link flex items-center h-8 px-2 border rounded mr-2" onclick="copyText(`@Url.PageLink("Upload", values: new { id = Model.Id })`)" title="Copy link">
+    <i class="fas fa-link"></i>
+</button>
+<a target="_blank" class="flex items-center h-8 px-2 border rounded mr-2" asp-controller="Upload" asp-action="Raw" asp-route-id="@Model.Id" title="View raw file">
+    <i class="fas fa-eye"></i>
+</a>
+<a target="_blank" class="flex items-center h-8 px-2 border rounded" asp-controller="Upload" asp-action="Download" asp-route-id="@Model.Id" title="Download file">
+    <i class="fas fa-download"></i>
+</a>

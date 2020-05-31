@@ -2,13 +2,14 @@
 @using Honeydew.Models
 @model Honeydew.Pages.UploadModel
 @{
-    ViewData["Title"] = "ViewUpload";
     ViewData["HideHeader"] = true;
 }
 
 <div class="flex justify-center">
     @if (Model.Upload == null)
     {
+        ViewData["Title"] = "Not Found";
+
         <div class="my-16 text-center">
             <h1 class="text-2xl mb-4">Nothing here!</h1>
             <div class="text-gray-600">This upload is swimmin' with the fishes.</div>
@@ -20,6 +21,8 @@
 
     @if (Model.Upload.Status == UploadStatus.Pending)
     {
+        ViewData["Title"] = "Waiting for Upload: " + Model.Upload.Name;
+
         var random = new System.Security.Cryptography.RNGCryptoServiceProvider();
         var bytes = new byte[60 * 60];
         random.GetBytes(bytes);
@@ -59,6 +62,8 @@
     }
 
     @{
+        ViewData["Title"] = Model.Upload.Name;
+
         var url = $"/{Model.Id}/raw";
     }
 
@@ -131,7 +136,9 @@
                     <span class="text-gray-400 mr-4">@Model.Upload.CodeLanguage</span>
                 }
 
-                <partial name="_UploadActionButtons" model="Model.Upload" />
+                <div class="flex items-stretch h-100">
+                    <partial name="_UploadActionButtons" model="Model.Upload" />
+                </div>
             </div>
         </div>
     </div>
