@@ -54,7 +54,7 @@ namespace Honeydew.Tasks
             else
             {
                 _logger.LogInformation(
-                    "Deletion scheduler not marked to run as {settingName} was set to false", 
+                    "Deletion scheduler not marked to run as {settingName} was set to false",
                     nameof(DeletionOptions.ScheduleAndMarkUploadsForDeletion));
             }
         }
@@ -63,7 +63,7 @@ namespace Honeydew.Tasks
         {
             using var scope = _serviceProvider.CreateScope();
             using var context = scope.ServiceProvider.GetService<ApplicationDbContext>();
-            var tusConfiguration = scope.ServiceProvider.GetService<DefaultTusConfiguration>();
+            using var store = scope.ServiceProvider.GetService<IUploadStore>();
 
             var now = DateTimeOffset.UtcNow;
 
@@ -76,7 +76,7 @@ namespace Honeydew.Tasks
                 {
                     if (_deletionOptions.CurrentValue.AlsoDeleteFileFromStorage)
                     {
-                        await (tusConfiguration.Store as IHoneydewTusStore).DeleteFileAsync(upload.Id, CancellationToken.None);
+                        await store.DeleteAsync(upload, CancellationToken.None);
                     }
                     else
                     {

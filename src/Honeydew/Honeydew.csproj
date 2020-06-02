@@ -6,9 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="TusStores\AmazonS3TusStore.cs" />
+    <Compile Remove="TusStores\AzureBlobTusStore.cs" />
     <Compile Remove="UploadStores\AmazonS3TusStore.cs" />
-    <Compile Remove="UploadStores\AzureBlobTusStore.cs" />
-    <Compile Remove="UploadStores\CloudProviderTusFile.cs" />
   </ItemGroup>
 
   <ItemGroup>

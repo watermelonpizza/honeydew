@@ -5,10 +5,12 @@ using Honeydew.Data;
 using Honeydew.Models;
 using Honeydew.UploadStores;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.Net.Http.Headers;
 using tusdotnet.Models;
 
 namespace Honeydew.Controllers
@@ -17,24 +19,24 @@ namespace Honeydew.Controllers
     [ApiController]
     public class UploadController : ControllerBase
     {
-        private readonly IStreamStore _streamStore;
-        private readonly DefaultTusConfiguration _defaultTusConfiguration;
+        private readonly IUploadStore _store;
         private readonly ApplicationDbContext _context;
         private readonly UserManager<User> _userManager;
         private readonly IOptionsMonitor<DeletionOptions> _deletionOptions;
+        private readonly SlugGenerator _slugGenerator;
 
         public UploadController(
-            IStreamStore streamStore,
-            DefaultTusConfiguration defaultTusConfiguration,
+            IUploadStore streamStore,
             ApplicationDbContext context,
             UserManager<User> userManager,
-            IOptionsMonitor<DeletionOptions> deletionOptions)
+            IOptionsMonitor<DeletionOptions> deletionOptions,
+            SlugGenerator slugGenerator)
         {
-            _streamStore = streamStore;
-            _defaultTusConfiguration = defaultTusConfiguration;
+            _store = streamStore;
             _context = context;
             _userManager = userManager;
             _deletionOptions = deletionOptions;
+            _slugGenerator = slugGenerator;
         }
 
         [HttpPost]
@@ -46,11 +48,33 @@ namespace Honeydew.Controllers
                 return BadRequest("`filename` query parameter must be supplied");
             }
 
-            filename = Path.GetFileName(filename);
+            var name = Path.GetFileNameWithoutExtension(filename);
+            var extension = Path.GetExtension(filename);
 
-            await _streamStore.WriteAllBytesAsync(filename, Request.Body, Request.HttpContext.RequestAborted);
+            var upload = new Upload
+            {
+                Id = await _slugGenerator.GenerateSlugAsync(Request.HttpContext.RequestAborted),
+                Name = name,
+                Extension = extension,
+                OriginalFileNameWithExtension = Path.GetFileName(filename),
+                MediaType = MediaTypeHelpers.GetMediaTypeFromExtension(extension),
+                Length = Request.ContentLength.GetValueOrDefault(),
+                UserId = _userManager.GetUserId(User),
+                CreatedBy = _userManager.GetUserName(User)
+            };
 
-            return Ok();
+            await _context.Uploads.AddAsync(upload, Request.HttpContext.RequestAborted);
+
+            await _context.SaveChangesAsync(Request.HttpContext.RequestAborted);
+
+            await _store.WriteAllBytesAsync(upload, Request.Body, Request.HttpContext.RequestAborted);
+
+            return Ok(
+                new JsonResult(
+                    new
+                    {
+                        url = Url.PageLink("Upload", values: new { id = upload.Id })
+                    }));
         }
 
         [HttpPatch]
@@ -109,8 +133,7 @@ namespace Honeydew.Controllers
             {
                 if (_deletionOptions.CurrentValue.AlsoDeleteFileFromStorage)
                 {
-                    await (_defaultTusConfiguration.Store as IHoneydewTusStore)
-                        .DeleteFileAsync(id, Request.HttpContext.RequestAborted);
+                    await _store.DeleteAsync(upload, Request.HttpContext.RequestAborted);
                 }
 
                 _context.Uploads.Remove(upload);
@@ -159,18 +182,19 @@ namespace Honeydew.Controllers
                 return NotFound();
             }
 
-            var uploadFile =
-                await (_defaultTusConfiguration.Store as IHoneydewTusStore).GetFileAsync(id, Request.HttpContext.RequestAborted);
+            var range = Request.GetTypedHeaders().Range;
+
+            var stream = await _store.DownloadAsync(upload, range, Request.HttpContext.RequestAborted);
 
             Response.Headers.Add("Content-Disposition", $"{contentDispositionType};filename={upload.Name + upload.Extension}");
 
             if (MediaTypeHelpers.ParseMediaType(upload.MediaType) == MediaType.Text)
             {
-                return File(await uploadFile.GetContentAsync(Request.HttpContext.RequestAborted), "text/plain", true);
+                return File(stream, "text/plain", true);
             }
             else
             {
-                return File(await uploadFile.GetContentAsync(Request.HttpContext.RequestAborted), upload.MediaType, true);
+                return File(stream, upload.MediaType, true);
             }
         }
     }

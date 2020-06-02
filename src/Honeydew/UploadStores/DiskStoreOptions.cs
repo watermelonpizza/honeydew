@@ -1,6 +1,6 @@
 ﻿namespace Honeydew.UploadStores
 {
-    public class StreamDiskStoreOptions
+    public class DiskStoreOptions
     {
         public string CacheDirectory { get; set; }
         public string StorageDirectory { get; set; }

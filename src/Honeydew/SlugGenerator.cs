@@ -18,7 +18,7 @@ namespace Honeydew
             _slugOptions = configuration.CurrentValue;
         }
 
-        public async Task<string> GenerateSlug(CancellationToken cancellationToken)
+        public async Task<string> GenerateSlugAsync(CancellationToken cancellationToken)
         {
             var tries = 0;
             string slug;

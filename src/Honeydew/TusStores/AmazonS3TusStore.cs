@@ -12,7 +12,7 @@ using Newtonsoft.Json;
 using tusdotnet.Interfaces;
 using tusdotnet.Models;
 
-namespace Honeydew.UploadStores
+namespace Honeydew.TusStores
 {
     public class AmazonS3TusStore : ITusStore, ITusCreationStore, ITusReadableStore
     {

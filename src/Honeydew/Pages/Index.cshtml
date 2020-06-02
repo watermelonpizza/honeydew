@@ -71,8 +71,8 @@
              patch(url, { @nameof(PatchUploadModel.CodeLanguage): codeLanguage })
                 .catch(err => console.log(err))
                 .finally(() => {
-                    input.disabled = false;
-                    input.classList.remove('loading');
+                    select.disabled = false;
+                    select.classList.remove('loading');
                 });
         }
 

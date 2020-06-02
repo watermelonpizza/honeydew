@@ -77,14 +77,16 @@
                 break;
             case Models.MediaType.Audio:
 
-                <audio src="@url" controls></audio>
+                <div class="m-4">
+                    <audio class="w-full" src="@url" controls autoplay></audio>
+                </div>
 
                 break;
             case Models.MediaType.Font:
                 break;
             case Models.MediaType.Image:
 
-                <div class="bg-no-repeat bg-center bg-contain" style="background-image: url(@url)"></div>
+                <img src="@url" class="img" />
 
                 break;
             case Models.MediaType.Model:
@@ -98,7 +100,7 @@
                 break;
             case Models.MediaType.Video:
 
-                <video class="w-full" src="@url" controls></video>
+                <video class="w-full" src="@url" controls autoplay muted></video>
 
                 break;
             case Models.MediaType.UnknownOrNotSupported:
@@ -158,6 +160,7 @@
                         monaco.editor.create(document.getElementById('monacoContainer'), {
                             value: text,
                             language: `@Model.Upload.CodeLanguage`,
+                            readOnly: true,
                             minimap: {
                                 enabled: false
                             },

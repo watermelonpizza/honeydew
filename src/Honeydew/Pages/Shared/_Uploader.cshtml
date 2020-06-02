@@ -1,10 +1,10 @@
 ﻿<noscript class="block border-l-4 border-red-500 p-4 m-4 text-lg bg-red-200 text-red-500">Javascript is required to upload</noscript>
 
-<div class="upload-bar grid grid-cols-1 grid-rows-1 p-2 md:p-4 m-4 rounded bg-purple-600 text-purple-100">
-    <div id="uploadProgress" class="flex flex-col justify-between col-start-1 row-start-1 transition-opacity duration-1000 opacity-0 pointer-events-none">
-        <div class="flex items-center">
+<div class="upload-bar grid grid-cols-1 grid-rows-1 p-2 m-4 rounded bg-purple-600 text-purple-100">
+    <div id="uploadProgress" class="flex flex-col justify-center px-2 col-start-1 row-start-1 transition-opacity duration-1000 opacity-0 pointer-events-none">
+        <div class="flex items-center mb-2">
             <span class="inline-block text-purple-200 mr-1">Uploading</span>
-            <a id="fileUrlLink" href="" class="inline-block mr-2 text-white hover:text-purple-100">Getting url...</a>
+            <a id="fileUrlLink" href="" target="_blank" class="inline-block mr-2 text-white hover:text-purple-100">Getting url...</a>
             <i class="fas fa-external-link-alt"></i>
             <span id="progressPercentage" class="inline-block ml-4 text-purple-200">0%</span>
         </div>
@@ -99,7 +99,7 @@
             // Create a new tus upload
             const upload = new tus.Upload(file, {
                 // Endpoint is the upload creation URL from your tus server
-                endpoint: '/upload',
+                endpoint: '/api/tusupload',
                 // Retry delays will enable tus-js-client to automatically retry on errors
                 retryDelays: [0, 3000, 5000, 10000, 20000],
                 // Attach additional meta data about the file for the server

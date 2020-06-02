@@ -22,23 +22,29 @@ namespace Honeydew.Models
 
     public static class MediaTypeHelpers
     {
+        public static string GetMediaTypeFromExtension(string extension)
+        {
+            var provider = new FileExtensionContentTypeProvider();
+            provider.Mappings.Add(".sql", "application/sql");
+
+            // TODO: Turn this into settings for custom mappings
+            if (!provider.TryGetContentType(extension, out string mediaType))
+            {
+                mediaType = "application/octet-stream";
+            }
+
+            return mediaType;
+        }
+
         public static string GetMediaTypeFromMetadata(Dictionary<string, tusdotnet.Models.Metadata> metadata)
         {
             if (!metadata.ContainsKey("mediaType")
                 || metadata["mediaType"].HasEmptyValue
                 || string.IsNullOrWhiteSpace(metadata["mediaType"].GetString(Encoding.UTF8)))
             {
-                var provider = new FileExtensionContentTypeProvider();
-                provider.Mappings.Add(".sql", "application/sql");
-
                 var extension = Path.GetExtension(metadata["name"].GetString(Encoding.UTF8));
-                // TODO: Turn this into settings for custom mappings
-                if (!provider.TryGetContentType(extension, out string mediaType))
-                {
-                    mediaType = "application/octet-stream";
-                }
 
-                return mediaType;
+                return GetMediaTypeFromExtension(extension);
             }
 
             return metadata["mediaType"].GetString(Encoding.UTF8);

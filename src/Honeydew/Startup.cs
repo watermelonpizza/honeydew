@@ -31,6 +31,7 @@ using tusdotnet.Models.Configuration;
 using tusdotnet.Models.Expiration;
 using tusdotnet.Models.Concatenation;
 using Honeydew.Tasks;
+using Honeydew.TusStores;
 #if DEBUG
 using Westwind.AspNetCore.LiveReload;
 #endif
@@ -129,10 +130,11 @@ namespace Honeydew
             switch (storageType)
             {
                 case StorageType.Disk:
-                    services.Configure<StreamDiskStoreOptions>(Configuration.GetSection("Storage:Disk"));
-                    services.AddSingleton<IStreamStore, StreamDiskStore>();
+                    services.Configure<DiskStoreOptions>(Configuration.GetSection("Storage:Disk"));
+                    services.AddTransient<IUploadStore, DiskStore>();
                     break;
                 case StorageType.AzureBlob:
+                    services.AddTransient<IUploadStore, AzureBlobStore>();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -146,17 +148,10 @@ namespace Honeydew
             {
                 var logger = serviceProvider.GetService<ILoggerFactory>().CreateLogger<Startup>();
 
-                ITusStore store = storageType switch
-                {
-                    StorageType.Disk => new TusDiskStore(serviceProvider),
-                    StorageType.AzureBlob => throw new NotImplementedException(),
-                    _ => throw new ArgumentOutOfRangeException()
-                };
-
                 return new DefaultTusConfiguration
                 {
-                    Store = store,
-                    UrlPath = "/upload",
+                    Store = new HoneydewTusStore(serviceProvider),
+                    UrlPath = "/api/tusupload",
                     MetadataParsingStrategy = MetadataParsingStrategy.AllowEmptyValues,
                     Events = new Events
                     {

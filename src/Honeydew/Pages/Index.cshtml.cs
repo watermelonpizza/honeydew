@@ -23,7 +23,7 @@ namespace Honeydew.Pages
     public class IndexModel : PageModel
     {
         private readonly ILogger<IndexModel> _logger;
-        private readonly IStreamStore _streamStore;
+        private readonly IUploadStore _streamStore;
         private readonly UserManager<User> _userManager;
         private readonly ApplicationDbContext _context;
         private readonly DefaultTusConfiguration _defaultTusConfiguration;
@@ -31,7 +31,7 @@ namespace Honeydew.Pages
 
         public IndexModel(
             ILogger<IndexModel> logger,
-            IStreamStore streamStore,
+            IUploadStore streamStore,
             ApplicationDbContext context,
             UserManager<User> userManager,
             DefaultTusConfiguration defaultTusConfiguration,
