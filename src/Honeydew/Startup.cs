@@ -32,6 +32,8 @@ using tusdotnet.Models.Expiration;
 using tusdotnet.Models.Concatenation;
 using Honeydew.Tasks;
 using Honeydew.TusStores;
+using Honeydew.AuthenticationHandlers;
+using Microsoft.AspNetCore.Authentication.Cookies;
 #if DEBUG
 using Westwind.AspNetCore.LiveReload;
 #endif
@@ -69,6 +71,9 @@ namespace Honeydew
             services.Configure<DeletionOptions>(Configuration.GetSection("Deletion"));
 
             services.AddHostedService<DeletionCleanupTask>();
+
+            services.AddAuthentication()
+                .AddScheme<TokenAuthenticationHandlerOptions, TokenAuthenticationHandler>("token", options => { });
 
             var builder = services.AddRazorPages();
 

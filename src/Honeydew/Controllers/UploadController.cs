@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Honeydew.Data;
 using Honeydew.Models;
 using Honeydew.UploadStores;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -15,8 +16,8 @@ using tusdotnet.Models;
 
 namespace Honeydew.Controllers
 {
-    [Authorize]
     [ApiController]
+    [Authorize(AuthenticationSchemes = "Identity.Application,token")]
     public class UploadController : ControllerBase
     {
         private readonly IUploadStore _store;
