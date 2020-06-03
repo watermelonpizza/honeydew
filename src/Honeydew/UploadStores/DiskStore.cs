@@ -14,9 +14,8 @@ using tusdotnet.Stores;
 
 namespace Honeydew.UploadStores
 {
-    public class DiskStore : IUploadStore
+    public class DiskStore : UploadStore<DiskStoreOptions>
     {
-        private readonly IDisposable _onChangeHandler;
         private readonly ILogger _logger;
         private readonly ApplicationDbContext _context;
 
@@ -33,112 +32,16 @@ namespace Honeydew.UploadStores
             ILogger<DiskStore> logger,
             IOptionsMonitor<DiskStoreOptions> options,
             ApplicationDbContext context)
+            : base(options)
         {
             _logger = logger;
             _context = context;
-
-            SetupOptions(options.CurrentValue);
-            _onChangeHandler = options.OnChange(SetupOptions);
 
             _maxWriteBufferSize = TusDiskBufferSize.Default.WriteBufferSizeInBytes;
             _maxReadBufferSize = TusDiskBufferSize.Default.ReadBufferSizeInBytes;
         }
 
-        public async Task DeleteAsync(string uploadId, CancellationToken cancellationToken)
-        {
-            var upload = await _context.Uploads.FindAsync(new[] { uploadId }, cancellationToken);
-
-            await DeleteAsync(upload, cancellationToken);
-        }
-
-        public Task DeleteAsync(Upload upload, CancellationToken cancellationToken)
-        {
-            File.Delete(Path.Combine(_storagePath, upload.Id + upload.Extension));
-
-            return Task.CompletedTask;
-        }
-
-        public async Task<Stream> DownloadAsync(string uploadId, RangeHeaderValue range, CancellationToken cancellationToken)
-        {
-            var upload = await _context.Uploads.FindAsync(new[] { uploadId }, cancellationToken);
-
-            return await DownloadAsync(upload, range, cancellationToken);
-        }
-
-        public Task<Stream> DownloadAsync(Upload upload, RangeHeaderValue range, CancellationToken cancellationToken)
-        {
-            return Task.FromResult<Stream>(File.OpenRead(Path.Combine(_storagePath, upload.Id + upload.Extension)));
-        }
-
-        public async Task<long> AppendToUploadAsync(string uploadId, Stream stream, CancellationToken cancellationToken)
-        {
-            var upload = await _context.Uploads.FindAsync(new[] { uploadId }, cancellationToken);
-
-            return await AppendToUploadAsync(upload, stream, cancellationToken);
-        }
-
-        public async Task<long> AppendToUploadAsync(Upload upload, Stream stream, CancellationToken cancellationToken)
-        {
-            var (bytesWrittenThisRequest, clientDisconnectedDuringRead) = await AppendToUploadInternalAsync(
-                upload,
-                stream,
-                cancellationToken);
-
-            if (clientDisconnectedDuringRead)
-            {
-                return bytesWrittenThisRequest;
-            }
-
-            upload.UploadedLength += bytesWrittenThisRequest;
-
-            if (upload.Length == upload.UploadedLength)
-            {
-                File.Move(
-                   Path.Combine(_cachePath, upload.Id + upload.Extension),
-                   Path.Combine(_storagePath, upload.Id + upload.Extension),
-                   true);
-            }
-
-            // Don't want the user to be able to cancel
-            await _context.SaveChangesAsync();
-
-            return bytesWrittenThisRequest;
-        }
-
-        public async Task WriteAllBytesAsync(string uploadId, Stream stream, CancellationToken cancellationToken)
-        {
-            var upload = await _context.Uploads.FindAsync(new[] { uploadId }, cancellationToken);
-
-            await WriteAllBytesAsync(upload, stream, cancellationToken);
-        }
-
-        public async Task WriteAllBytesAsync(Upload upload, Stream stream, CancellationToken cancellationToken)
-        {
-            var cacheFilePath = Path.Combine(_cachePath, upload.Id + upload.Extension);
-            var targetFilePath = Path.Combine(_storagePath, upload.Id + upload.Extension);
-
-            await using (var file = File.OpenWrite(cacheFilePath))
-            {
-                await stream.CopyToAsync(file, cancellationToken);
-            }
-
-            // User cancelled the upload, kill the file.
-            if (cancellationToken.IsCancellationRequested)
-            {
-                File.Delete(cacheFilePath);
-            }
-            else
-            {
-                File.Move(cacheFilePath, targetFilePath);
-            }
-        }
-
-        public void Dispose()
-        {
-            _onChangeHandler.Dispose();
-        }
-
-        private void SetupOptions(DiskStoreOptions options)
+        public override void SetupOptions(DiskStoreOptions options)
         {
             _cachePath = options.CacheDirectory;
             _storagePath = options.StorageDirectory;
@@ -168,6 +71,95 @@ namespace Honeydew.UploadStores
             {
                 _logger.LogCritical(e, "Storage path `{cachePath}` didn't exist, and attempt was made to create it and failed.", _storagePath);
                 throw;
+            }
+        }
+
+        public override async Task DeleteAsync(string uploadId, CancellationToken cancellationToken)
+        {
+            var upload = await _context.Uploads.FindAsync(new[] { uploadId }, cancellationToken);
+
+            await DeleteAsync(upload, cancellationToken);
+        }
+
+        public override Task DeleteAsync(Upload upload, CancellationToken cancellationToken)
+        {
+            File.Delete(Path.Combine(_storagePath, upload.Id + upload.Extension));
+
+            return Task.CompletedTask;
+        }
+
+        public override async Task<Stream> DownloadAsync(string uploadId, RangeHeaderValue range, CancellationToken cancellationToken)
+        {
+            var upload = await _context.Uploads.FindAsync(new[] { uploadId }, cancellationToken);
+
+            return await DownloadAsync(upload, range, cancellationToken);
+        }
+
+        public override Task<Stream> DownloadAsync(Upload upload, RangeHeaderValue range, CancellationToken cancellationToken)
+        {
+            return Task.FromResult<Stream>(File.OpenRead(Path.Combine(_storagePath, upload.Id + upload.Extension)));
+        }
+
+        public override async Task<long> AppendToUploadAsync(string uploadId, Stream stream, CancellationToken cancellationToken)
+        {
+            var upload = await _context.Uploads.FindAsync(new[] { uploadId }, cancellationToken);
+
+            return await AppendToUploadAsync(upload, stream, cancellationToken);
+        }
+
+        public override async Task<long> AppendToUploadAsync(Upload upload, Stream stream, CancellationToken cancellationToken)
+        {
+            var (bytesWrittenThisRequest, clientDisconnectedDuringRead) = await AppendToUploadInternalAsync(
+                upload,
+                stream,
+                cancellationToken);
+
+            if (clientDisconnectedDuringRead)
+            {
+                return bytesWrittenThisRequest;
+            }
+
+            upload.UploadedLength += bytesWrittenThisRequest;
+
+            if (upload.Length == upload.UploadedLength)
+            {
+                File.Move(
+                   Path.Combine(_cachePath, upload.Id + upload.Extension),
+                   Path.Combine(_storagePath, upload.Id + upload.Extension),
+                   true);
+            }
+
+            // Don't want the user to be able to cancel
+            await _context.SaveChangesAsync();
+
+            return bytesWrittenThisRequest;
+        }
+
+        public override async Task WriteAllBytesAsync(string uploadId, Stream stream, CancellationToken cancellationToken)
+        {
+            var upload = await _context.Uploads.FindAsync(new[] { uploadId }, cancellationToken);
+
+            await WriteAllBytesAsync(upload, stream, cancellationToken);
+        }
+
+        public override async Task WriteAllBytesAsync(Upload upload, Stream stream, CancellationToken cancellationToken)
+        {
+            var cacheFilePath = Path.Combine(_cachePath, upload.Id + upload.Extension);
+            var targetFilePath = Path.Combine(_storagePath, upload.Id + upload.Extension);
+
+            await using (var file = File.OpenWrite(cacheFilePath))
+            {
+                await stream.CopyToAsync(file, cancellationToken);
+            }
+
+            // User cancelled the upload, kill the file.
+            if (cancellationToken.IsCancellationRequested)
+            {
+                File.Delete(cacheFilePath);
+            }
+            else
+            {
+                File.Move(cacheFilePath, targetFilePath);
             }
         }
 

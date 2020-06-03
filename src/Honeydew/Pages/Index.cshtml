@@ -7,47 +7,47 @@
     ViewData["Title"] = "Home page";
 }
 
-<div class="mb-4">
+<div class="m-2 sm:m-4">
     <partial name="_Uploader" />
 </div>
 
-<div class="p-4">
-    <div class="space-y-4">
+<div class="p-2 sm:p-4">
+    <div class="space-y-3">
         @foreach (var upload in Model.UserUploads)
         {
             var link = Url.PageLink("Upload", values: new { id = upload.Id });
             var patchLink = Url.Action("PatchUpload", "Upload", new { id = upload.Id });
 
-            <div class="upload-item p-4 mx-auto max-w-3xl sm:flex items-start justify-between shadow hover:shadow-lg transform transition-all duration-100 ease-in-out hover:-translate-y-1 rounded bg-white">
-                <div class="flex-grow mb-4 sm:mb-0 sm:mr-8">
-                    <div class="form-group mb-4">
+            <div class="upload-item p-2 sm:p-4 mx-auto max-w-3xl shadow hover:shadow-lg transform transition-all duration-100 ease-in-out hover:-translate-y-1 rounded bg-white">
+                <div class="sm:flex mb-2 lg:mb-4">
+                    <div class="flex-grow form-group @(MediaTypeHelpers.ParseMediaType(upload.MediaType) == MediaType.Text ? "mb-2 sm:mb-0 sm:mr-4" : "")">
                         <input class="form-input" value="@upload.Name" onchange="updateName(`@patchLink`, this)" autocomplete="off" spellcheck="false" />
                         <label class="form-attachment">@upload.Extension</label>
                     </div>
 
-                    <a class="h-full" asp-page="Upload" asp-route-id="@upload.Id">@link</a>
-                </div>
-
-                <div class="flex sm:block items-stretch sm:justify-end">
                     @if (MediaTypeHelpers.ParseMediaType(upload.MediaType) == MediaType.Text)
                     {
-                        <select class="sm:w-full form-select mr-2 sm:mr-0 sm:mb-2"
-                                name="CodeLanguage"
-                                asp-items="CodeLanguageHelper.GetLanguages(upload.CodeLanguage)"
-                                onchange="updateCodeLanguage(`@patchLink`, this)">
-                        </select>
+                        <div>
+                            <select class="sm:w-full form-select mr-2 sm:mr-0 sm:mb-2"
+                                    name="CodeLanguage"
+                                    asp-items="CodeLanguageHelper.GetLanguages(upload.CodeLanguage)"
+                                    onchange="updateCodeLanguage(`@patchLink`, this)">
+                            </select>
+                        </div>
                     }
-                    else
-                    {
-                        <span class="flex-grow"></span>
-                    }
+                </div>
+
+                <div class="sm:flex items-center justify-between">
+                    <div class="mb-4 sm:mb-0 sm:mr-4">
+                        <a class="h-full" asp-page="Upload" asp-route-id="@upload.Id">@link</a>
+                    </div>
 
                     <div class="flex items-stretch h-100">
                         <partial name="_UploadActionButtons" model="upload" />
 
                         @if (Model.AllowDeletion)
                         {
-                            <button class="link flex items-center border-red-500 hover:text-red-700 text-red-500 ml-2 h-8 px-2 border rounded mr-2" onclick="deleteUpload(`@Url.Action("DeleteUpload", "Upload", values: new { Id = upload.Id })`, this)" title="Delete Upload">
+                            <button class="link flex items-center border-red-500 hover:text-red-700 text-red-500 ml-2 h-8 px-2 border rounded" onclick="deleteUpload(`@Url.Action("DeleteUpload", "Upload", values: new { Id = upload.Id })`, this)" title="Delete Upload">
                                 <i class="trash-icon fas fa-trash-alt"></i>
                                 <i class="undo-icon hidden fas fa-undo"></i>
                                 <span class="text hidden lg:inline ml-2">Delete</span>

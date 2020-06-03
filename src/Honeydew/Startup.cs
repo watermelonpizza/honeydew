@@ -133,8 +133,9 @@ namespace Honeydew
                     services.Configure<DiskStoreOptions>(Configuration.GetSection("Storage:Disk"));
                     services.AddTransient<IUploadStore, DiskStore>();
                     break;
-                case StorageType.AzureBlob:
-                    services.AddTransient<IUploadStore, AzureBlobStore>();
+                case StorageType.AzureBlobs:
+                    services.Configure<AzureBlobsStoreOptions>(Configuration.GetSection("Storage:AzureBlobs"));
+                    services.AddTransient<IUploadStore, AzureBlobsStore>();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

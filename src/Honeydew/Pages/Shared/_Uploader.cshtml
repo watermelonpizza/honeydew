@@ -1,12 +1,24 @@
-﻿<noscript class="block border-l-4 border-red-500 p-4 m-4 text-lg bg-red-200 text-red-500">Javascript is required to upload</noscript>
+﻿<noscript class="block border-l-4 border-red-500 p-2 sm:p-4 text-lg bg-red-200 text-red-500">Javascript is required to upload</noscript>
 
-<div class="upload-bar grid grid-cols-1 grid-rows-1 p-2 m-4 rounded bg-purple-600 text-purple-100">
-    <div id="uploadProgress" class="flex flex-col justify-center px-2 col-start-1 row-start-1 transition-opacity duration-1000 opacity-0 pointer-events-none">
-        <div class="flex items-center mb-2">
-            <span class="inline-block text-purple-200 mr-1">Uploading</span>
-            <a id="fileUrlLink" href="" target="_blank" class="inline-block mr-2 text-white hover:text-purple-100">Getting url...</a>
+<div class="upload-bar grid grid-cols-1 grid-rows-1 p-2 rounded bg-purple-600 text-purple-100">
+    <div id="uploadDone" class="upload-status flex flex-col md:flex-row md:items-center px-2 col-start-1 row-start-1 transition-opacity duration-700 hidden pointer-events-none">
+        <span class="inline-block text-purple-200 mr-1">Complete! Linky:</span>
+        <span class="flex items-center">
+            <a id="completeFileUrlLink" href="" target="_blank" class="inline-block mr-2 text-white hover:text-purple-100">Getting url...</a>
             <i class="fas fa-external-link-alt"></i>
-            <span id="progressPercentage" class="inline-block ml-4 text-purple-200">0%</span>
+        </span>
+        <div class="flex-grow"></div>
+        <button class="inline-block mt-4 md:mt-0 md:ml-2 cursor-pointer whitespace-no-wrap" onclick="resetUpload()">Upload another?</button>
+    </div>
+
+    <div id="uploadProgress" class="upload-status flex flex-col justify-center px-2 col-start-1 row-start-1 transition-opacity duration-700 hidden pointer-events-none">
+        <div class="md:flex items-center mb-2">
+            <div class="inline-block text-purple-200 mr-1">Uploading</div>
+            <div>
+                <a id="fileUrlLink" href="" target="_blank" class="inline-block mr-2 text-white hover:text-purple-100">Getting url...</a>
+                <i class="fas fa-external-link-alt"></i>
+                <span id="progressPercentage" class="inline-block ml-4 text-purple-200">0%</span>
+            </div>
         </div>
 
         <div class="flex h-px bg-purple-400 rounded w-full">
@@ -14,7 +26,7 @@
         </div>
     </div>
 
-    <div id="uploadInput" class="flex items-center col-start-1 row-start-1 transition-opacity duration-500">
+    <div id="uploadInput" class="upload-status flex items-center col-start-1 row-start-1 transition-opacity duration-700">
         <input id="fileInput" type="file" name="files" class="absolute opacity-0" style="z-index:-1;" />
         <label for="fileInput" class="file-input-select-button mr-6 md:mr-0 inline-block pl-3 md:pl-4 cursor-pointer whitespace-no-wrap">
             <i class="mr-3 md:mr-4 fas fa-magic"></i>
@@ -91,8 +103,23 @@
 
     //}
 
+    const uploadInput = document.getElementById("uploadInput");
+    const uploadProgress = document.getElementById("uploadProgress");
+    const uploadDone = document.getElementById("uploadDone");
+
+
+    const progressBar = document.getElementById("progressBar");
+    const progressPercentage = document.getElementById("progressPercentage");
+
+    function resetUpload() {
+        uploadInput.classList.remove("hidden", "pointer-events-none");
+        uploadProgress.classList.add("hidden", "pointer-events-none");
+        uploadDone.classList.add("hidden", "pointer-events-none");
+    }
+
     document.getElementById('fileInput')
-        .addEventListener('change', function (e) {
+        .addEventListener('change', (e) => {
+            console.log('changes!!!!');
             // Get the selected file from the input element
             const file = e.target.files[0];
 
@@ -108,22 +135,32 @@
                     mediaType: file.type
                 },
                 // Callback for errors which cannot be fixed using retries
-                onError: function (error) {
+                onError: (error) => {
                     console.log(`Failed because: ${error}`);
                 },
                 // Callback for reporting upload progress
-                onProgress: function (bytesUploaded, bytesTotal) {
+                onProgress: (bytesUploaded, bytesTotal) => {
                     const percentage = (bytesUploaded / bytesTotal * 100).toFixed(2);
-                    document.getElementById("progressBar").style.width = percentage + "%";
-                    document.getElementById("progressPercentage").innerText = Math.round(percentage) + "%";
+
+                    progressBar.style.width = percentage + "%";
+                    progressPercentage.innerText = Math.round(percentage) + "%";
+
                     console.log(bytesUploaded, bytesTotal, percentage + "%");
                 },
                 // Callback for once the upload is completed
-                onSuccess: function () {
+                onSuccess: () => {
                     console.log("Download %s from %s", upload.file.name, upload.url);
 
+                    document.getElementById('fileInput').value = null;
+
+                    progressBar.style.width = "0%";
+                    progressPercentage.innerText = "0%";
+
+                    uploadInput.classList.add("hidden", "pointer-events-none");
+                    uploadProgress.classList.add("hidden", "pointer-events-none");
+                    uploadDone.classList.remove("hidden", "pointer-events-none");
                 },
-                onAfterResponse: function (req, res) {
+                onAfterResponse: (req, res) => {
                     const location = res.getHeader("Location");
 
                     if (location) {
@@ -131,16 +168,18 @@
                         const fileId = split[split.length - 1];
 
                         const anchor = document.getElementById('fileUrlLink');
+                        const completeAnchor = document.getElementById('completeFileUrlLink');
                         anchor.href = `/${fileId}`;
+                        completeAnchor.href = `/${fileId}`;
 
-                        console.log(file);
-                        anchor.innerText = file.name;
+                        anchor.innerText = `${file.name} (${fileId})`;
+                        completeAnchor.innerText = `${window.location.href}${fileId}`;
                     }
                 }
             });
 
-            document.getElementById("uploadInput").classList.add("opacity-0", "pointer-events-none");
-            document.getElementById("uploadProgress").classList.remove("opacity-0", "pointer-events-none");
+            uploadInput.classList.add("hidden", "pointer-events-none");
+            uploadProgress.classList.remove("hidden", "pointer-events-none");
 
             // Start the upload
             upload.start();

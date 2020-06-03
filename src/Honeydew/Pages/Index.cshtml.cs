@@ -65,7 +65,6 @@ namespace Honeydew.Pages
                 await _context.Uploads
                 .Where(x => x.UserId == userId)
                 .Where(x => !x.PendingForDeletionAt.HasValue)
-                .Take(10)
                 .OrderByDescending(x => x.CreatedUtc)
                 .ToListAsync();
         }

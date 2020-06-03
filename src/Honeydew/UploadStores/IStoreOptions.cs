@@ -5,9 +5,7 @@ using System.Threading.Tasks;
 
 namespace Honeydew.UploadStores
 {
-    public enum StorageType
+    public interface IStoreOptions
     {
-        Disk,
-        AzureBlobs
     }
 }
