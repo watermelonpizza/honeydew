@@ -16,6 +16,9 @@ namespace Honeydew.AuthenticationHandlers
 {
     public class TokenAuthenticationHandler : AuthenticationHandler<TokenAuthenticationHandlerOptions>
     {
+        public const string TokenAuthenticationSchemeName = "token";
+        public const string TokenAuthenticationUserTokenName = "apikey";
+
         private readonly ApplicationDbContext _context;
 
         public TokenAuthenticationHandler(
@@ -68,7 +71,10 @@ namespace Honeydew.AuthenticationHandlers
         private async Task<AuthenticateResult> ValidateToken(string token, CancellationToken cancellationToken)
         {
             var userToken = await _context.UserTokens.FirstOrDefaultAsync(
-                x => x.LoginProvider == Scheme.Name && x.Value == token,
+                x =>
+                    x.LoginProvider == TokenAuthenticationSchemeName
+                    && x.Name == TokenAuthenticationUserTokenName
+                    && x.Value == token,
                 cancellationToken);
 
             if (userToken == null)
@@ -81,11 +87,11 @@ namespace Honeydew.AuthenticationHandlers
             var claims =
                 new List<Claim>
                 {
-                    new Claim(ClaimTypes.Sid, user.Id),
+                    new Claim(ClaimTypes.NameIdentifier, user.Id),
                     new Claim(ClaimTypes.Name, user.UserName),
                 };
 
-            var identity = new ClaimsIdentity(claims);
+            var identity = new ClaimsIdentity(claims, Scheme.Name);
             var principal = new ClaimsPrincipal(identity);
             var ticket = new AuthenticationTicket(principal, Scheme.Name);
 

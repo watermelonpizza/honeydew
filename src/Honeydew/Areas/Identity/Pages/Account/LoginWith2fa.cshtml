@@ -7,23 +7,21 @@
 <h1>@ViewData["Title"]</h1>
 <hr />
 <p>Your login is protected with an authenticator app. Enter your authenticator code below.</p>
-<div class="row">
-    <div class="col-md-4">
+<div class="flex">
+    <div class="md:w-1/3">
         <form method="post" asp-route-returnUrl="@Model.ReturnUrl">
             <input asp-for="RememberMe" type="hidden" />
             <div asp-validation-summary="All" class="text-red-500"></div>
             <div class="form-group">
                 <label asp-for="Input.TwoFactorCode"></label>
-                <input asp-for="Input.TwoFactorCode" class="form-control" autocomplete="off" />
+                <input asp-for="Input.TwoFactorCode" class="form-input" autocomplete="off" />
                 <span asp-validation-for="Input.TwoFactorCode" class="text-red-500"></span>
             </div>
             <div class="form-group">
-                <div class="checkbox">
-                    <label asp-for="Input.RememberMachine">
-                        <input asp-for="Input.RememberMachine" />
-                        @Html.DisplayNameFor(m => m.Input.RememberMachine)
-                    </label>
-                </div>
+                <label class="flex items-center" asp-for="Input.RememberMachine">
+                    <input class="form-checkbox" asp-for="Input.RememberMachine" />
+                    <span class="ml-2">@Html.DisplayNameFor(m => m.Input.RememberMachine)</span>
+                </label>
             </div>
             <div class="form-group">
                 <button type="submit" class="btn btn-primary">Log in</button>

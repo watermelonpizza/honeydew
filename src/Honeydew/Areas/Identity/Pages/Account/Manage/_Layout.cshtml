@@ -9,17 +9,17 @@
     }
 }
 
-<h2>Manage your account</h2>
+<div class="p-2 sm:p-4">
+    <h2 class="text-xl">Manage your account</h2>
 
-<div>
-    <h4>Change your account settings</h4>
-    <hr />
-    <div class="row">
-        <div class="col-md-3">
-            <partial name="_ManageNav" />
-        </div>
-        <div class="col-md-9">
-            @RenderBody()
+    <div class="mt-4">
+        <div class="md:flex divide-y md:divide-y-0 md:divide-x divide-gray-400">
+            <div class="md:w-1/4">
+                <partial name="_ManageNav" />
+            </div>
+            <div class="md:w-3/4 pt-4 mt-4 md:pt-0 md:mt-0 md:pl-4 md:ml-4">
+                @RenderBody()
+            </div>
         </div>
     </div>
 </div>

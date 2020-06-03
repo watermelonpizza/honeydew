@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using Honeydew.AuthenticationHandlers;
 using Honeydew.Data;
 using Honeydew.Models;
 using Honeydew.UploadStores;
@@ -17,7 +18,7 @@ using tusdotnet.Models;
 namespace Honeydew.Controllers
 {
     [ApiController]
-    [Authorize(AuthenticationSchemes = "Identity.Application,token")]
+    [Authorize(AuthenticationSchemes = "Identity.Application," + TokenAuthenticationHandler.TokenAuthenticationSchemeName)]
     public class UploadController : ControllerBase
     {
         private readonly IUploadStore _store;
@@ -122,12 +123,12 @@ namespace Honeydew.Controllers
 
             var upload = await _context.Uploads
                 .FirstOrDefaultAsync(
-                    x => x.Id == id && x.UserId == userId,
+                    x => x.Id == id && x.UserId == userId && x.PendingForDeletionAt == null,
                     Request.HttpContext.RequestAborted);
 
             if (upload == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             if (!_deletionOptions.CurrentValue.ScheduleAndMarkUploadsForDeletion)

@@ -73,7 +73,9 @@ namespace Honeydew
             services.AddHostedService<DeletionCleanupTask>();
 
             services.AddAuthentication()
-                .AddScheme<TokenAuthenticationHandlerOptions, TokenAuthenticationHandler>("token", options => { });
+                .AddScheme<TokenAuthenticationHandlerOptions, TokenAuthenticationHandler>(
+                    TokenAuthenticationHandler.TokenAuthenticationSchemeName,
+                    options => { });
 
             var builder = services.AddRazorPages();
 

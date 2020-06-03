@@ -1,0 +1,33 @@
+﻿@page
+@model Honeydew.Areas.Identity.Pages.Account.Manage.ApiKeyModel
+@{
+    ViewData["Title"] = "API Key";
+    ViewData["ActivePage"] = ManageNavPages.ApiKey;
+}
+
+<h4 class="font-bold">Your API Key</h4>
+
+<p class="mb-1">
+    Use this key for the ability to upload images via the api at <code class="p-1 rounded bg-gray-200">/api/upload</code>.
+</p>
+<p>
+    It should be used as the auth header like so: <code class="p-1 rounded bg-gray-200">Authorization: Token &lt;apikey&gt;</code>
+</p>
+
+@if (Model.ApiToken != null)
+{
+    <code class="inline-block rounded bg-gray-200 text-orange-500 my-5 p-2">@Model.ApiToken</code>
+}
+else
+{
+    <div class="alert alert-info">Generate an api key to get started</div>
+}
+
+@if (Model.ErrorMessage != null)
+{
+    <div class="alert alert-error mb-4">@Model.ErrorMessage</div>
+}
+
+<form id="download-data" asp-page="ApiKey" method="post" class="form-group">
+    <button class="btn btn-primary" type="submit">@(Model.ApiToken == null ? "Generate Key" : "Generate New Key")</button>
+</form>
