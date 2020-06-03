@@ -189,7 +189,7 @@ namespace Honeydew.UploadStores
 
         public override Task WriteAllBytesAsync(Upload upload, Stream stream, CancellationToken cancellationToken)
         {
-            var blob = _blobContainerClient.GetBlockBlobClient(upload.Id);
+            var blob = _blobContainerClient.GetBlockBlobClient(upload.Id + upload.Extension);
 
             return blob.UploadAsync(
                 stream,

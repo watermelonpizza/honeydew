@@ -71,11 +71,16 @@ namespace Honeydew.Controllers
 
             await _store.WriteAllBytesAsync(upload, Request.Body, Request.HttpContext.RequestAborted);
 
+            upload.Status = UploadStatus.Complete;
+
+            // File is fully uploaded, don't let the user cancel this request
+            await _context.SaveChangesAsync();
+
             return Ok(
                 new JsonResult(
                     new
                     {
-                        url = Url.PageLink("Upload", values: new { id = upload.Id })
+                        url = Url.PageLink("/Upload", values: new { id = upload.Id })
                     }));
         }
 

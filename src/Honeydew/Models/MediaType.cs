@@ -56,6 +56,7 @@ namespace Honeydew.Models
                 "application/pdf" => MediaType.Application,
                 "application/vnd.ms-excel" => MediaType.Text,
                 "application/sql" => MediaType.Text,
+                "application/json" => MediaType.Text,
 
                 var type when type.StartsWith("audio") => MediaType.Audio,
 
