@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Honeydew.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200527141513_AddOriginalFileNameColumn")]
-    partial class AddOriginalFileNameColumn
+    [Migration("20200605070458_CreateInitialDatabase")]
+    partial class CreateInitialDatabase
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -29,11 +29,15 @@ namespace Honeydew.Data.Migrations
                     b.Property<int?>("BlockNumber")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("CodeLanguage")
+                        .HasColumnType("TEXT")
+                        .HasMaxLength(25);
+
                     b.Property<string>("CreatedBy")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("CreatedUtc")
-                        .HasColumnType("TEXT");
+                    b.Property<long>("CreatedUtc")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Extension")
                         .HasColumnType("TEXT");
@@ -51,6 +55,12 @@ namespace Honeydew.Data.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("OriginalFileNameWithExtension")
+                        .HasColumnType("TEXT");
+
+                    b.Property<long?>("PendingForDeletionAt")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ProviderUploadId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Status")
@@ -96,8 +106,8 @@ namespace Honeydew.Data.Migrations
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("TEXT");
+                    b.Property<long?>("LockoutEnd")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("NormalizedEmail")
                         .HasColumnType("TEXT")

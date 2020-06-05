@@ -144,6 +144,10 @@ namespace Honeydew
                     services.Configure<AzureBlobsStoreOptions>(Configuration.GetSection("Storage:AzureBlobs"));
                     services.AddTransient<IUploadStore, AzureBlobsStore>();
                     break;
+                case StorageType.S3:
+                    services.Configure<S3StoreOptions>(Configuration.GetSection("Storage:S3"));
+                    services.AddTransient<IUploadStore, S3Store>();
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }

@@ -34,8 +34,8 @@ namespace Honeydew.Data.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTimeOffset>("CreatedUtc")
-                        .HasColumnType("TEXT");
+                    b.Property<long>("CreatedUtc")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Extension")
                         .HasColumnType("TEXT");
@@ -55,7 +55,10 @@ namespace Honeydew.Data.Migrations
                     b.Property<string>("OriginalFileNameWithExtension")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTimeOffset?>("PendingForDeletionAt")
+                    b.Property<long?>("PendingForDeletionAt")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ProviderUploadId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Status")
@@ -101,8 +104,8 @@ namespace Honeydew.Data.Migrations
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("TEXT");
+                    b.Property<long?>("LockoutEnd")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("NormalizedEmail")
                         .HasColumnType("TEXT")

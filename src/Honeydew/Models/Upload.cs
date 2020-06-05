@@ -31,6 +31,11 @@ namespace Honeydew.Models
         public string BlockIds { get; set; }
         public int? BlockNumber { get; set; }
 
+        /// <summary>
+        /// Third party upload id for temporary block uploads
+        /// </summary>
+        public string ProviderUploadId { get; set; }
+
         public string Url { get; set; }
 
         [MaxLength(20)]

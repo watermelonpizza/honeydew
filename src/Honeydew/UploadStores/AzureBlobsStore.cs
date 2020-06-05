@@ -23,14 +23,17 @@ namespace Honeydew.UploadStores
 {
     public class AzureBlobsStore : UploadStore<AzureBlobsStoreOptions>
     {
-        public const int blockSize = 1_048_576; // 1 MiB
+        public const int blockSize = 1 * 1024 * 1024; // 1 MB
 
         private readonly ILogger _logger;
         private readonly ApplicationDbContext _context;
         private BlobContainerClient _blobContainerClient;
 
-        public AzureBlobsStore(ApplicationDbContext context, IOptionsMonitor<AzureBlobsStoreOptions> options, ILogger<AzureBlobsStore> logger)
-            : base(options)
+        public AzureBlobsStore(
+            ApplicationDbContext context,
+            IOptionsMonitor<AzureBlobsStoreOptions> options,
+            ILogger<AzureBlobsStore> logger)
+            : base(options, context)
         {
             _context = context;
             _logger = logger;
@@ -62,23 +65,9 @@ namespace Honeydew.UploadStores
                     options.ContainerName);
         }
 
-        public override async Task DeleteAsync(string uploadId, CancellationToken cancellationToken)
-        {
-            var upload = await _context.Uploads.FindAsync(new[] { uploadId }, cancellationToken);
-
-            await DeleteAsync(upload, cancellationToken);
-        }
-
         public override Task DeleteAsync(Upload upload, CancellationToken cancellationToken)
         {
             return _blobContainerClient.DeleteBlobIfExistsAsync(upload.Id + upload.Extension);
-        }
-
-        public override async Task<Stream> DownloadAsync(string uploadId, RangeHeaderValue range, CancellationToken cancellationToken)
-        {
-            var upload = await _context.Uploads.FindAsync(new[] { uploadId }, cancellationToken);
-
-            return await DownloadAsync(upload, range, cancellationToken);
         }
 
         public override async Task<Stream> DownloadAsync(Upload upload, RangeHeaderValue range, CancellationToken cancellationToken)
@@ -88,13 +77,6 @@ namespace Honeydew.UploadStores
             var response = await blob.DownloadAsync(new HttpRange(), cancellationToken: cancellationToken);
 
             return response.Value.Content;
-        }
-
-        public override async Task<long> AppendToUploadAsync(string uploadId, Stream stream, CancellationToken cancellationToken)
-        {
-            var upload = await _context.Uploads.FindAsync(new[] { uploadId }, cancellationToken);
-
-            return await AppendToUploadAsync(upload, stream, cancellationToken);
         }
 
         public override async Task<long> AppendToUploadAsync(Upload upload, Stream stream, CancellationToken cancellationToken)
@@ -178,13 +160,6 @@ namespace Honeydew.UploadStores
                 _logger.LogError(e, "Failed to append data");
                 throw;
             }
-        }
-
-        public override async Task WriteAllBytesAsync(string uploadId, Stream stream, CancellationToken cancellationToken)
-        {
-            var upload = await _context.Uploads.FindAsync(new[] { uploadId }, cancellationToken);
-
-            await WriteAllBytesAsync(upload, stream, cancellationToken);
         }
 
         public override Task WriteAllBytesAsync(Upload upload, Stream stream, CancellationToken cancellationToken)

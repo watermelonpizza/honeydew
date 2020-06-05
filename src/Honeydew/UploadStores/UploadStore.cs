@@ -1,4 +1,5 @@
-﻿using Honeydew.Models;
+﻿using Honeydew.Data;
+using Honeydew.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using System;
@@ -16,22 +17,52 @@ namespace Honeydew.UploadStores
         private readonly IOptionsMonitor<TOptions> _options;
         private readonly IDisposable _onChangeCallback;
 
-        public UploadStore(IOptionsMonitor<TOptions> optionsMonitor)
+        protected ApplicationDbContext DbContext { get; }
+
+        public UploadStore(IOptionsMonitor<TOptions> optionsMonitor, ApplicationDbContext context)
         {
             _options = optionsMonitor;
+            DbContext = context;
 
             SetupOptions(_options.CurrentValue);
 
             _onChangeCallback = _options.OnChange(SetupOptions);
         }
 
-        public abstract Task<long> AppendToUploadAsync(string uploadId, Stream stream, CancellationToken cancellationToken);
+        public async Task<long> AppendToUploadAsync(string uploadId, Stream stream, CancellationToken cancellationToken)
+        {
+            var upload = await DbContext.Uploads.FindAsync(new[] { uploadId }, cancellationToken);
+
+            return await AppendToUploadAsync(upload, stream, cancellationToken);
+        }
+
         public abstract Task<long> AppendToUploadAsync(Upload upload, Stream stream, CancellationToken cancellationToken);
-        public abstract Task DeleteAsync(string uploadId, CancellationToken cancellationToken);
+
+        public async Task DeleteAsync(string uploadId, CancellationToken cancellationToken)
+        {
+            var upload = await DbContext.Uploads.FindAsync(new[] { uploadId }, cancellationToken);
+
+            await DeleteAsync(upload, cancellationToken);
+        }
+
         public abstract Task DeleteAsync(Upload upload, CancellationToken cancellationToken);
-        public abstract Task<Stream> DownloadAsync(string uploadId, RangeHeaderValue range, CancellationToken cancellationToken);
+
+        public async Task<Stream> DownloadAsync(string uploadId, RangeHeaderValue range, CancellationToken cancellationToken)
+        {
+            var upload = await DbContext.Uploads.FindAsync(new[] { uploadId }, cancellationToken);
+
+            return await DownloadAsync(upload, range, cancellationToken);
+        }
+
         public abstract Task<Stream> DownloadAsync(Upload upload, RangeHeaderValue range, CancellationToken cancellationToken);
-        public abstract Task WriteAllBytesAsync(string uploadId, Stream stream, CancellationToken cancellationToken);
+
+        public async Task WriteAllBytesAsync(string uploadId, Stream stream, CancellationToken cancellationToken)
+        {
+            var upload = await DbContext.Uploads.FindAsync(new[] { uploadId }, cancellationToken);
+
+            await WriteAllBytesAsync(upload, stream, cancellationToken);
+        }
+
         public abstract Task WriteAllBytesAsync(Upload upload, Stream stream, CancellationToken cancellationToken);
 
         public abstract void SetupOptions(TOptions options);

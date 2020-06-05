@@ -32,7 +32,7 @@ namespace Honeydew.UploadStores
             ILogger<DiskStore> logger,
             IOptionsMonitor<DiskStoreOptions> options,
             ApplicationDbContext context)
-            : base(options)
+            : base(options, context)
         {
             _logger = logger;
             _context = context;
@@ -74,13 +74,6 @@ namespace Honeydew.UploadStores
             }
         }
 
-        public override async Task DeleteAsync(string uploadId, CancellationToken cancellationToken)
-        {
-            var upload = await _context.Uploads.FindAsync(new[] { uploadId }, cancellationToken);
-
-            await DeleteAsync(upload, cancellationToken);
-        }
-
         public override Task DeleteAsync(Upload upload, CancellationToken cancellationToken)
         {
             File.Delete(Path.Combine(_storagePath, upload.Id + upload.Extension));
@@ -88,23 +81,9 @@ namespace Honeydew.UploadStores
             return Task.CompletedTask;
         }
 
-        public override async Task<Stream> DownloadAsync(string uploadId, RangeHeaderValue range, CancellationToken cancellationToken)
-        {
-            var upload = await _context.Uploads.FindAsync(new[] { uploadId }, cancellationToken);
-
-            return await DownloadAsync(upload, range, cancellationToken);
-        }
-
         public override Task<Stream> DownloadAsync(Upload upload, RangeHeaderValue range, CancellationToken cancellationToken)
         {
             return Task.FromResult<Stream>(File.OpenRead(Path.Combine(_storagePath, upload.Id + upload.Extension)));
-        }
-
-        public override async Task<long> AppendToUploadAsync(string uploadId, Stream stream, CancellationToken cancellationToken)
-        {
-            var upload = await _context.Uploads.FindAsync(new[] { uploadId }, cancellationToken);
-
-            return await AppendToUploadAsync(upload, stream, cancellationToken);
         }
 
         public override async Task<long> AppendToUploadAsync(Upload upload, Stream stream, CancellationToken cancellationToken)
@@ -133,13 +112,6 @@ namespace Honeydew.UploadStores
             await _context.SaveChangesAsync();
 
             return bytesWrittenThisRequest;
-        }
-
-        public override async Task WriteAllBytesAsync(string uploadId, Stream stream, CancellationToken cancellationToken)
-        {
-            var upload = await _context.Uploads.FindAsync(new[] { uploadId }, cancellationToken);
-
-            await WriteAllBytesAsync(upload, stream, cancellationToken);
         }
 
         public override async Task WriteAllBytesAsync(Upload upload, Stream stream, CancellationToken cancellationToken)

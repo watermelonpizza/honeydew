@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Honeydew.Data.Migrations
 {
@@ -37,7 +36,7 @@ namespace Honeydew.Data.Migrations
                     PhoneNumber = table.Column<string>(nullable: true),
                     PhoneNumberConfirmed = table.Column<bool>(nullable: false),
                     TwoFactorEnabled = table.Column<bool>(nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(nullable: true),
+                    LockoutEnd = table.Column<long>(nullable: true),
                     LockoutEnabled = table.Column<bool>(nullable: false),
                     AccessFailedCount = table.Column<int>(nullable: false)
                 },
@@ -159,16 +158,21 @@ namespace Honeydew.Data.Migrations
                     Id = table.Column<string>(nullable: false),
                     Name = table.Column<string>(nullable: true),
                     Extension = table.Column<string>(nullable: true),
-                    ContentType = table.Column<string>(nullable: true),
+                    OriginalFileNameWithExtension = table.Column<string>(nullable: true),
+                    MediaType = table.Column<string>(nullable: true),
+                    CodeLanguage = table.Column<string>(maxLength: 25, nullable: true),
                     UploadedLength = table.Column<long>(nullable: false),
                     Length = table.Column<long>(nullable: false),
                     Metadata = table.Column<string>(nullable: true),
                     BlockIds = table.Column<string>(nullable: true),
                     BlockNumber = table.Column<int>(nullable: true),
+                    ProviderUploadId = table.Column<string>(nullable: true),
+                    Url = table.Column<string>(nullable: true),
                     Status = table.Column<string>(maxLength: 20, nullable: false),
+                    PendingForDeletionAt = table.Column<long>(nullable: true),
                     UserId = table.Column<string>(nullable: true),
                     CreatedBy = table.Column<string>(nullable: true),
-                    CreatedUtc = table.Column<DateTime>(nullable: false)
+                    CreatedUtc = table.Column<long>(nullable: false)
                 },
                 constraints: table =>
                 {

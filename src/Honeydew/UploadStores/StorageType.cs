@@ -8,6 +8,7 @@ namespace Honeydew.UploadStores
     public enum StorageType
     {
         Disk,
-        AzureBlobs
+        AzureBlobs,
+        S3
     }
 }
