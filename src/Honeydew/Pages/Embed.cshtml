@@ -4,7 +4,6 @@
     Layout = null;
 
     var rawUrl = Url.ActionLink("Raw", "Upload", new { id = Model.Id });
-    var mainUrl = Url.PageLink("Upload", values: new { id = Model.Id });
 
     ViewData["Title"] = Model.Upload.Name;
 }
@@ -32,10 +31,16 @@
     {
         case Models.MediaType.Video:
 
-            <video class="w-full" src="@rawUrl" controls autoplay muted></video>
+            <video class="checkered-background w-screen max-h-screen" src="@rawUrl" controls></video>
+
+            break;
+        case Models.MediaType.Audio:
+
+            <audio class="w-screen" src="@rawUrl" controls></audio>
 
             break;
         default:
+            var mainUrl = Url.PageLink("Upload", values: new { id = Model.Id });
 
             <div class="m-8 text-indigo-800">
                 This media type does not support embedding yet. View this upload at <a href="@mainUrl">@mainUrl</a>

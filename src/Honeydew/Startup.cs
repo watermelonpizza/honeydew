@@ -90,8 +90,13 @@ namespace Honeydew
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app)
+        public void Configure(IApplicationBuilder app, ApplicationDbContext context)
         {
+            if (bool.TryParse(Configuration["Database:AutoMigrateDatabase"], out bool migrateDatabase) && migrateDatabase)
+            {
+                context.Database.Migrate();
+            }
+
             if (Environment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

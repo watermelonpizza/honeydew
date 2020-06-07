@@ -68,7 +68,7 @@
         var embedUrl = Url.PageLink("Embed", values: new { id = Model.Id });
 
         ViewData["Title"] = Model.Upload.Name;
-        ViewData["og:description"] = "Check out this sweet upload! " + Model.Upload.Name;
+        ViewData["og:description"] = "";
         ViewData["og:type"] = MediaTypeHelpers.GetOpenGraphTypeFromMediaType(Model.MediaTypeCategory);
     }
 
@@ -83,18 +83,20 @@
             case Models.MediaType.Audio:
                 @section Head {
                     <meta name="twitter:card" content="player">
-                    <meta name="twitter:player:stream" content="@rawUrl">
+                    <meta name="twitter:player" content="@embedUrl">
+                    <meta name="twitter:player:width" content="480">
+                    <meta name="twitter:player:height" content="270">
 
-                    <meta property="og:audio" content="@rawUrl" />
-                    <meta property="og:audio:type" content="@Model.Upload.MediaType" />
+                    <meta property="og:audio:url" content="@embedUrl" />
+                    <meta property="og:audio:secure_url" content="@embedUrl" />
+                    <meta property="og:audio:type" content="text/html" />
+
                 }
 
                 <div class="m-4">
                     <audio class="w-full" src="@rawUrl" controls autoplay></audio>
                 </div>
 
-                break;
-            case Models.MediaType.Font:
                 break;
             case Models.MediaType.Image:
                 ViewData["og:image"] = rawUrl;
@@ -103,15 +105,9 @@
                     <meta name="twitter:card" content="summary_large_image">
 
                     <meta property="og:image:type" content="@Model.Upload.MediaType" />
-                    <meta property="og:image:width" content="640" />
-                    <meta property="og:image:height" content="480" />
                 }
 
                 <img src="@rawUrl" class="img" />
-
-                break;
-            case Models.MediaType.Model:
-
 
                 break;
             case Models.MediaType.Text:
@@ -147,19 +143,23 @@
                 @section Head {
                     <meta name="twitter:card" content="player">
                     <meta name="twitter:player" content="@embedUrl">
-                    <meta name="twitter:player:stream" content="@rawUrl">
+                    <meta name="twitter:player:width" content="480">
+                    <meta name="twitter:player:height" content="270">
 
-                    <meta property="og:video" content="@rawUrl" />
-                    <meta property="og:video:url" content="@rawUrl" />
-                    <meta property="og:video:secure_url" content="@rawUrl" />
-                    <meta property="og:video:type" content="@Model.Upload.MediaType" />
-                    <meta property="og:video:width" content="1920" />
-                    <meta property="og:video:height" content="1080" />
+                    <meta property="og:video:url" content="@embedUrl" />
+                    <meta property="og:video:secure_url" content="@embedUrl" />
+                    <meta property="og:video:type" content="text/html" />
+                    <meta property="og:video:width" content="480" />
+                    <meta property="og:video:height" content="270" />
+
+                    <link rel="alternate" type="application/json+oembed" href="@Html.Raw(Url.ActionLink("OEmbed", "Upload", new { format = "json", url = Uri.EscapeUriString(Request.GetDisplayUrl()) }))" title="@ViewData["Title"]">
                 }
 
-                <video class="w-full" src="@rawUrl" controls autoplay muted></video>
+                <video class="w-full video" src="@rawUrl" controls autoplay></video>
 
                 break;
+            case Models.MediaType.Model:
+            case Models.MediaType.Font:
             case Models.MediaType.UnknownOrNotSupported:
             default:
 
@@ -185,7 +185,7 @@
                 : "";
         }
 
-        <div class="flex items-center justify-between flex-wrap @extraPadding px-2 py-1">
+        <div class="flex items-center justify-between flex-wrap @extraPadding h-12">
             <h1 class="m-2 text-lg">
                 @Model.Upload.Name<span class="text-gray-600">@Model.Upload.Extension</span>
             </h1>

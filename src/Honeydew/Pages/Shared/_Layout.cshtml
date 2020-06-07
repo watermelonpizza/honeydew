@@ -3,15 +3,18 @@
 <head>
     <partial name="_HtmlHeadTagsPartial" />
 
-    <meta name="description" content="@(ViewData["og:description"] ?? "Upload your files and share them anywhere with honeydew!")" />
-
-    <meta name="twitter:title" content="@ViewData["Title"] - Honeydew" />
-    <meta name="twitter:description" content="@(ViewData["og:description"] ?? "Upload your files and share them anywhere with honeydew!")" />
+    <meta name="twitter:title" content="@ViewData["Title"]" />
     <meta name="twitter:image" content="@(ViewData["og:image"] ?? Context.Request.Scheme + "://" + Context.Request.Host + Url.Content("~/assets/logo.png"))" />
 
     <meta property="og:site_name" content="Honeydew" />
-    <meta property="og:title" content="@ViewData["Title"] - Honeydew" />
-    <meta property="og:description" content="@(ViewData["og:description"] ?? "Upload your files and share them anywhere with honeydew!")" />
+    <meta property="og:title" content="@ViewData["Title"]" />
+
+    @if (ViewData["og:description"] as string != "")
+    {
+        <meta name="twitter:description" content="@(ViewData["og:description"] ?? "Upload your files and share them anywhere with honeydew!")" />
+        <meta property="og:description" content="@(ViewData["og:description"] ?? "Upload your files and share them anywhere with honeydew!")" />
+    }
+
     <meta property="og:type" content="@(ViewData["og:type"] ?? "website")" />
     <meta property="og:url" content="@(ViewData["og:url"] ?? Context.Request.GetDisplayUrl())" />
     <meta property="og:image" content="@(ViewData["og:image"] ?? Context.Request.Scheme + "://" + Context.Request.Host + Url.Content("~/assets/logo.png"))" />
@@ -36,7 +39,7 @@
         @RenderBody()
     </main>
 
-    <footer class="flex items-center justify-center p-4 text-gray-400">
+    <footer class="flex items-center justify-center min-h-16 text-gray-400">
         &copy; 2020 - Honeydew
     </footer>
 

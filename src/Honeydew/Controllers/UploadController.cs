@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using System.Web;
 using Azure;
 using Azure.Storage.Blobs;
 using Honeydew.AuthenticationHandlers;
@@ -13,6 +14,7 @@ using Honeydew.UploadStores;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -44,6 +46,45 @@ namespace Honeydew.Controllers
             _userManager = userManager;
             _deletionOptions = deletionOptions;
             _slugGenerator = slugGenerator;
+        }
+
+        [HttpGet]
+        [Route("/api/oembed")]
+        public async Task<IActionResult> OEmbed(string url)
+        {
+            try
+            {
+                var uri = new Uri(HttpUtility.UrlDecode(url));
+                var path = uri.AbsolutePath.Trim('/');
+
+                var upload = await _context.Uploads.FindAsync(path);
+
+                if (upload == null)
+                {
+                    return NotFound();
+                }
+
+                var embedUrl = Url.PageLink("/Embed", values: new { id = upload.Id });
+                var html = $"<iframe width=\"480\" height=\"270\" src=\"{embedUrl}\" frameborder=\"0\" allow=\"accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture\" allowfullscreen></iframe>";
+
+                var requestUri = new Uri(Request.GetDisplayUrl());
+
+                return new JsonResult(
+                    new
+                    {
+                        type = "video",
+                        version = "1.0",
+                        html,
+                        width = 480,
+                        height = 270,
+                        provider_name = "Honeydew",
+                        provider_url = requestUri.GetLeftPart(UriPartial.Authority)
+                    });
+            }
+            catch (Exception)
+            {
+                return NotFound();
+            }
         }
 
         [HttpPost]
@@ -82,12 +123,12 @@ namespace Honeydew.Controllers
             // File is fully uploaded, don't let the user cancel this request
             await _context.SaveChangesAsync();
 
-            return Ok(
+            return
                 new JsonResult(
                     new
                     {
                         url = Url.PageLink("/Upload", values: new { id = upload.Id })
-                    }));
+                    });
         }
 
         [HttpPatch]

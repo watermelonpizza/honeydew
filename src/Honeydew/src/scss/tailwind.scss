@@ -2,6 +2,10 @@
 @tailwind base;
 @tailwind components;
 
+.min-h-16 {
+  min-height: theme('height.16');
+}
+
 a,
 .link {
   @apply text-purple-500;
@@ -113,7 +117,6 @@ header {
   width: calc(100vw - theme('margin.8'));
 
   @screen md {
-    @apply mt-16;
     width: calc(100vw - theme('margin.32'));
   }
 
@@ -197,15 +200,26 @@ header {
   }
 }
 
+$color1: #444;
+$color2: #333;
+$size: 20px;
+
+$background-item: linear-gradient(45deg, $color1 25%, transparent 25%, transparent 75%, $color1 75%), linear-gradient(45deg, $color1 25%, $color2 25%, $color2 75%, $color1 75%);
+
 .img {
   max-height: 70vh;
   object-fit: contain;
+}
 
-  $color1: #444;
-  $color2: #333;
-  $size: 20px;
+.video {
+  // h-screen - margin top of the page - height of the controls - height of the footer
+  max-height: calc(100vh - theme('margin.4') - (theme('height.12') + theme('height.16')));
+}
 
-  background-image: linear-gradient(45deg, $color1 25%, transparent 25%, transparent 75%, $color1 75%), linear-gradient(45deg, $color1 25%, $color2 25%, $color2 75%, $color1 75%);
+.img,
+.video,
+.checkered-background {
+  background-image: $background-item;
   background-size: $size $size;
   background-position: 0 0, $size/2 $size/2;
 }
