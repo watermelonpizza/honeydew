@@ -1,8 +1,13 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
+using Azure;
+using Azure.Storage.Blobs;
 using Honeydew.AuthenticationHandlers;
 using Honeydew.Data;
+using Honeydew.Helpers;
 using Honeydew.Models;
 using Honeydew.UploadStores;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -60,6 +65,7 @@ namespace Honeydew.Controllers
                 Extension = extension,
                 OriginalFileNameWithExtension = Path.GetFileName(filename),
                 MediaType = MediaTypeHelpers.GetMediaTypeFromExtension(extension),
+                CodeLanguage = CodeLanguageHelpers.GetLanageFromExtension(extension),
                 Length = Request.ContentLength.GetValueOrDefault(),
                 UserId = _userManager.GetUserId(User),
                 CreatedBy = _userManager.GetUserName(User)
@@ -164,13 +170,13 @@ namespace Honeydew.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        [Route("{id}/raw")]
+        [Route("/r/{id}")]
         public async Task<IActionResult> Raw(string id)
             => await GetFile(id, "inline");
 
         [HttpGet]
         [AllowAnonymous]
-        [Route("{id}/download")]
+        [Route("/d/{id}")]
         public async Task<IActionResult> Download(string id)
             => await GetFile(id, "attachment");
 
@@ -191,17 +197,24 @@ namespace Honeydew.Controllers
 
             var range = Request.GetTypedHeaders().Range;
 
-            var stream = await _store.DownloadAsync(upload, range, Request.HttpContext.RequestAborted);
+            var result = await _store.DownloadAsync(upload, range, Request.HttpContext.RequestAborted);
+
+            if (result.ContentRange != null)
+            {
+                Response.StatusCode = (int)HttpStatusCode.PartialContent;
+                Response.Headers.Add("Accept-Ranges", "bytes");
+                Response.Headers.Add("Content-Range", result.ContentRange);
+            }
 
             Response.Headers.Add("Content-Disposition", $"{contentDispositionType};filename={upload.Name + upload.Extension}");
 
             if (MediaTypeHelpers.ParseMediaType(upload.MediaType) == MediaType.Text)
             {
-                return File(stream, "text/plain", true);
+                return File(result.Stream, "text/plain", true);
             }
             else
             {
-                return File(stream, upload.MediaType, true);
+                return File(result.Stream, upload.MediaType, true);
             }
         }
     }

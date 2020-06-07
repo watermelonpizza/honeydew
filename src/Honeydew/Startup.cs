@@ -34,6 +34,7 @@ using Honeydew.Tasks;
 using Honeydew.TusStores;
 using Honeydew.AuthenticationHandlers;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Honeydew.Helpers;
 #if DEBUG
 using Westwind.AspNetCore.LiveReload;
 #endif
@@ -222,6 +223,7 @@ namespace Honeydew
                                     Extension = extension,
                                     OriginalFileNameWithExtension = Path.GetFileName(name),
                                     MediaType = mediaType,
+                                    CodeLanguage = CodeLanguageHelpers.GetLanageFromExtension(extension),
                                     Length = ctx.UploadLength,
                                     Metadata = ctx.HttpContext.Request.Headers[HeaderConstants.UploadMetadata],
                                     UserId = userManager.GetUserId(ctx.HttpContext.User),

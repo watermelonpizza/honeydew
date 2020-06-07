@@ -28,6 +28,7 @@ namespace Honeydew.UploadStores
 
         private IAmazonS3 _s3;
         private string _bucket;
+        private long _maximumAllowedDownloadRangeFromBucketInBytes = 16 * 1024 * 1024; // 16MiB
 
         public S3Store(ApplicationDbContext context, IOptionsMonitor<S3StoreOptions> options, ILogger<AzureBlobsStore> logger)
             : base(options, context)
@@ -70,6 +71,15 @@ namespace Honeydew.UploadStores
                     nameof(options.Region),
                     options.Region,
                     configValueExamples: "us-west-1");
+            }
+
+            if (options.MaximumAllowedRangeLengthFromBucketInBytes < 0)
+            {
+                throw new StorageConfigException(
+                    StorageType.AzureBlobs,
+                    nameof(options.MaximumAllowedRangeLengthFromBucketInBytes),
+                    options.MaximumAllowedRangeLengthFromBucketInBytes.ToString(),
+                    configValueExamples: new[] { "16777216", "0" });
             }
 
             _s3 = new AmazonS3Client(options.AccessKey, options.SecretAccessKey, RegionEndpoint.GetBySystemName(options.Region));
@@ -213,9 +223,23 @@ namespace Honeydew.UploadStores
             await _s3.DeleteObjectAsync(_bucket, upload.Id + upload.Extension, cancellationToken);
         }
 
-        public override Task<Stream> DownloadAsync(Upload upload, RangeHeaderValue range, CancellationToken cancellationToken)
+        public override async Task<DownloadResult> DownloadAsync(Upload upload, RangeHeaderValue range, CancellationToken cancellationToken)
         {
-            return _s3.GetObjectStreamAsync(_bucket, upload.Id + upload.Extension, null, cancellationToken);
+            var request = new GetObjectRequest
+            {
+                BucketName = _bucket,
+                Key = upload.Id + upload.Extension,
+                // TODO: Fix this
+                ByteRange = new ByteRange(range.Ranges.FirstOrDefault()?.From.GetValueOrDefault() ?? 0, range.Ranges.FirstOrDefault()?.To.GetValueOrDefault() ?? 0)
+            };
+
+            var stream = await _s3.GetObjectAsync(request);
+
+            return new DownloadResult
+            {
+                Stream = stream.ResponseStream,
+                ContentRange = stream.ContentRange
+            };
         }
 
         public override Task WriteAllBytesAsync(Upload upload, Stream stream, CancellationToken cancellationToken)

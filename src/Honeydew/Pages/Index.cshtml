@@ -8,11 +8,16 @@
 }
 
 <div class="m-2 sm:m-4">
-    <partial name="_Uploader" />
+    <partial name="_UploaderPartial" />
 </div>
 
 <div class="p-2 sm:p-4">
     <div class="space-y-3">
+        @if (!Model.UserUploads.Any())
+        {
+            <div class="my-8 text-3xl text-gray-700 text-center">😲 You don't have any uploads! Upload something to get started.</div>
+        }
+
         @foreach (var upload in Model.UserUploads)
         {
             var link = Url.PageLink("Upload", values: new { id = upload.Id });
@@ -30,7 +35,7 @@
                         <div>
                             <select class="sm:w-full form-select mr-2 sm:mr-0 sm:mb-2"
                                     name="CodeLanguage"
-                                    asp-items="CodeLanguageHelper.GetLanguages(upload.CodeLanguage)"
+                                    asp-items="CodeLanguageHelpers.GetLanguages(upload.CodeLanguage)"
                                     onchange="updateCodeLanguage(`@patchLink`, this)">
                             </select>
                         </div>
@@ -43,7 +48,7 @@
                     </div>
 
                     <div class="flex items-stretch h-100">
-                        <partial name="_UploadActionButtons" model="upload" />
+                        <partial name="_UploadActionButtonsPartial" model="upload" />
 
                         @if (Model.AllowDeletion)
                         {

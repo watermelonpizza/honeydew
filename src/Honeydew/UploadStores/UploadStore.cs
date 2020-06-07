@@ -47,14 +47,14 @@ namespace Honeydew.UploadStores
 
         public abstract Task DeleteAsync(Upload upload, CancellationToken cancellationToken);
 
-        public async Task<Stream> DownloadAsync(string uploadId, RangeHeaderValue range, CancellationToken cancellationToken)
+        public async Task<DownloadResult> DownloadAsync(string uploadId, RangeHeaderValue range, CancellationToken cancellationToken)
         {
             var upload = await DbContext.Uploads.FindAsync(new[] { uploadId }, cancellationToken);
 
             return await DownloadAsync(upload, range, cancellationToken);
         }
 
-        public abstract Task<Stream> DownloadAsync(Upload upload, RangeHeaderValue range, CancellationToken cancellationToken);
+        public abstract Task<DownloadResult> DownloadAsync(Upload upload, RangeHeaderValue range, CancellationToken cancellationToken);
 
         public async Task WriteAllBytesAsync(string uploadId, Stream stream, CancellationToken cancellationToken)
         {

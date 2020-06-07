@@ -25,8 +25,8 @@ namespace Honeydew.UploadStores
             Stream stream,
             CancellationToken cancellationToken);
 
-        public Task<Stream> DownloadAsync(string uploadId, RangeHeaderValue range, CancellationToken cancellationToken);
-        public Task<Stream> DownloadAsync(Upload upload, RangeHeaderValue range, CancellationToken cancellationToken);
+        public Task<DownloadResult> DownloadAsync(string uploadId, RangeHeaderValue range, CancellationToken cancellationToken);
+        public Task<DownloadResult> DownloadAsync(Upload upload, RangeHeaderValue range, CancellationToken cancellationToken);
 
         public Task DeleteAsync(string uploadId, CancellationToken cancellationToken);
         public Task DeleteAsync(Upload upload, CancellationToken cancellationToken);

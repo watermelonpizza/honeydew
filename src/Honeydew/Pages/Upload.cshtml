@@ -1,4 +1,4 @@
-﻿@page "/{id?}"
+﻿@page "/{id}"
 @using Honeydew.Models
 @model Honeydew.Pages.UploadModel
 @{
@@ -8,6 +8,7 @@
 <div class="flex justify-center">
     @if (Model.Upload == null)
     {
+        Response.StatusCode = 404;
         ViewData["Title"] = "Not Found";
 
         <div class="my-16 text-center">
@@ -21,6 +22,7 @@
 
     @if (Model.Upload.Status == UploadStatus.Pending)
     {
+        Response.StatusCode = 202; // HTTP 202 Accepted [The request has been accepted for processing, but the processing has not been completed]
         ViewData["Title"] = "Waiting for Upload: " + Model.Upload.Name;
 
         var random = new System.Security.Cryptography.RNGCryptoServiceProvider();
@@ -62,31 +64,50 @@
     }
 
     @{
-        ViewData["Title"] = Model.Upload.Name;
+        var rawUrl = Url.ActionLink("Raw", "Upload", new { id = Model.Id });
+        var embedUrl = Url.PageLink("Embed", values: new { id = Model.Id });
 
-        var url = $"/{Model.Id}/raw";
+        ViewData["Title"] = Model.Upload.Name;
+        ViewData["og:description"] = "Check out this sweet upload! " + Model.Upload.Name;
+        ViewData["og:type"] = MediaTypeHelpers.GetOpenGraphTypeFromMediaType(Model.MediaTypeCategory);
     }
 
-    <div class="upload-container flex flex-col items-stretch bg-white shadow-md">
+    <div class="upload-container flex flex-col items-stretch bg-white shadow">
         @switch (Model.MediaTypeCategory)
         {
             case Models.MediaType.Application:
 
-                <object class="w-full" type="@Model.Upload.MediaType" data="@url"></object>
+                <object class="w-full" type="@Model.Upload.MediaType" data="@rawUrl"></object>
 
                 break;
             case Models.MediaType.Audio:
+                @section Head {
+                    <meta name="twitter:card" content="player">
+                    <meta name="twitter:player:stream" content="@rawUrl">
+
+                    <meta property="og:audio" content="@rawUrl" />
+                    <meta property="og:audio:type" content="@Model.Upload.MediaType" />
+                }
 
                 <div class="m-4">
-                    <audio class="w-full" src="@url" controls autoplay></audio>
+                    <audio class="w-full" src="@rawUrl" controls autoplay></audio>
                 </div>
 
                 break;
             case Models.MediaType.Font:
                 break;
             case Models.MediaType.Image:
+                ViewData["og:image"] = rawUrl;
 
-                <img src="@url" class="img" />
+                @section Head {
+                    <meta name="twitter:card" content="summary_large_image">
+
+                    <meta property="og:image:type" content="@Model.Upload.MediaType" />
+                    <meta property="og:image:width" content="640" />
+                    <meta property="og:image:height" content="480" />
+                }
+
+                <img src="@rawUrl" class="img" />
 
                 break;
             case Models.MediaType.Model:
@@ -97,10 +118,46 @@
 
                 <div id="monacoContainer" style="min-height: 70vh; max-height: 70vh;"></div>
 
+                @section Scripts {
+                    <script src="~/js/monaco/loader.js"></script>
+                    <script>
+                        require.config({ paths: { 'vs': '/js/monaco/' } });
+
+                        require(['vs/editor/editor.main'], function () {
+                            fetch('@rawUrl')
+                                .then(async res => {
+                                    const text = await res.text();
+                                    monaco.editor.create(document.getElementById('monacoContainer'), {
+                                        value: text,
+                                        language: `@Model.Upload.CodeLanguage`,
+                                        readOnly: true,
+                                        minimap: {
+                                            enabled: false
+                                        },
+                                        automaticLayout: true
+                                    });
+                                })
+                                .catch(err => console.error(err));
+                        });
+                    </script>
+                }
+
                 break;
             case Models.MediaType.Video:
+                @section Head {
+                    <meta name="twitter:card" content="player">
+                    <meta name="twitter:player" content="@embedUrl">
+                    <meta name="twitter:player:stream" content="@rawUrl">
 
-                <video class="w-full" src="@url" controls autoplay muted></video>
+                    <meta property="og:video" content="@rawUrl" />
+                    <meta property="og:video:url" content="@rawUrl" />
+                    <meta property="og:video:secure_url" content="@rawUrl" />
+                    <meta property="og:video:type" content="@Model.Upload.MediaType" />
+                    <meta property="og:video:width" content="1920" />
+                    <meta property="og:video:height" content="1080" />
+                }
+
+                <video class="w-full" src="@rawUrl" controls autoplay muted></video>
 
                 break;
             case Models.MediaType.UnknownOrNotSupported:
@@ -139,36 +196,9 @@
                 }
 
                 <div class="flex items-stretch h-100">
-                    <partial name="_UploadActionButtons" model="Model.Upload" />
+                    <partial name="_UploadActionButtonsPartial" model="Model.Upload" />
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-@if (Model.MediaTypeCategory == MediaType.Text)
-{
-    @section Scripts {
-        <script src="~/js/monaco/loader.js"></script>
-        <script>
-            require.config({ paths: { 'vs': '/js/monaco/' } });
-
-            require(['vs/editor/editor.main'], function () {
-                fetch('@url')
-                    .then(async res => {
-                        const text = await res.text();
-                        monaco.editor.create(document.getElementById('monacoContainer'), {
-                            value: text,
-                            language: `@Model.Upload.CodeLanguage`,
-                            readOnly: true,
-                            minimap: {
-                                enabled: false
-                            },
-                            automaticLayout: true
-                        });
-                    })
-                    .catch(err => console.error(err));
-            });
-        </script>
-    }
-}

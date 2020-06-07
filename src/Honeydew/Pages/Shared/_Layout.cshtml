@@ -1,10 +1,20 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Honeydew</title>
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <partial name="_HtmlHeadTagsPartial" />
+
+    <meta name="description" content="@(ViewData["og:description"] ?? "Upload your files and share them anywhere with honeydew!")" />
+
+    <meta name="twitter:title" content="@ViewData["Title"] - Honeydew" />
+    <meta name="twitter:description" content="@(ViewData["og:description"] ?? "Upload your files and share them anywhere with honeydew!")" />
+    <meta name="twitter:image" content="@(ViewData["og:image"] ?? Context.Request.Scheme + "://" + Context.Request.Host + Url.Content("~/assets/logo.png"))" />
+
+    <meta property="og:site_name" content="Honeydew" />
+    <meta property="og:title" content="@ViewData["Title"] - Honeydew" />
+    <meta property="og:description" content="@(ViewData["og:description"] ?? "Upload your files and share them anywhere with honeydew!")" />
+    <meta property="og:type" content="@(ViewData["og:type"] ?? "website")" />
+    <meta property="og:url" content="@(ViewData["og:url"] ?? Context.Request.GetDisplayUrl())" />
+    <meta property="og:image" content="@(ViewData["og:image"] ?? Context.Request.Scheme + "://" + Context.Request.Host + Url.Content("~/assets/logo.png"))" />
 
     @await RenderSectionAsync("Head", required: false)
 </head>
@@ -12,8 +22,11 @@
     @if (!((ViewData["HideHeader"] is bool hide) && hide))
     {
         <header>
-            <nav class="flex items-center justify-between space-x-4 p-4">
-                <a class="brand" asp-area="" asp-page="/Index">Honeydew</a>
+            <nav class="flex items-center justify-between space-x-4 pl-2 pr-4 py-2">
+                <a class="brand flex items-center" asp-area="" asp-page="/Index">
+                    <img class="h-10 mr-3" src="@Url.Content("~/assets/logo.png")" />
+                    Honeydew
+                </a>
                 <partial name="_LoginPartial" />
             </nav>
         </header>
@@ -23,7 +36,7 @@
         @RenderBody()
     </main>
 
-    <footer class="flex items-center justify-center p-4 text-gray-600">
+    <footer class="flex items-center justify-center p-4 text-gray-400">
         &copy; 2020 - Honeydew
     </footer>
 

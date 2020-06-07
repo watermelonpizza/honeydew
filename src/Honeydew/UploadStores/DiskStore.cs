@@ -81,9 +81,13 @@ namespace Honeydew.UploadStores
             return Task.CompletedTask;
         }
 
-        public override Task<Stream> DownloadAsync(Upload upload, RangeHeaderValue range, CancellationToken cancellationToken)
+        public override Task<DownloadResult> DownloadAsync(Upload upload, RangeHeaderValue range, CancellationToken cancellationToken)
         {
-            return Task.FromResult<Stream>(File.OpenRead(Path.Combine(_storagePath, upload.Id + upload.Extension)));
+            return Task.FromResult(
+                new DownloadResult
+                {
+                    Stream = File.OpenRead(Path.Combine(_storagePath, upload.Id + upload.Extension))
+                });
         }
 
         public override async Task<long> AppendToUploadAsync(Upload upload, Stream stream, CancellationToken cancellationToken)

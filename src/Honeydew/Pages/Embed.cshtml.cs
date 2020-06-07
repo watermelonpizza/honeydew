@@ -1,19 +1,21 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Honeydew.Data;
 using Honeydew.Helpers;
 using Honeydew.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using tusdotnet.Models;
 
 namespace Honeydew.Pages
 {
-    public class UploadModel : PageModel
+    public class EmbedModel : PageModel
     {
         private readonly ApplicationDbContext _context;
 
-        public UploadModel(ApplicationDbContext context)
+        public EmbedModel(ApplicationDbContext context)
         {
             _context = context;
         }
@@ -25,7 +27,7 @@ namespace Honeydew.Pages
 
         public MediaType MediaTypeCategory => MediaTypeHelpers.ParseMediaType(Upload.MediaType);
 
-        public async Task OnGet()
+        public async Task OnGetAsync()
         {
             Upload = await _context.Uploads
                 .FirstOrDefaultAsync(x => x.Id == Id && !x.PendingForDeletionAt.HasValue, Request.HttpContext.RequestAborted);

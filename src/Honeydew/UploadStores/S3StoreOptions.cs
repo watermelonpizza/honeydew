@@ -11,5 +11,6 @@ namespace Honeydew.UploadStores
         public string AccessKey { get; set; }
         public string SecretAccessKey { get; set; }
         public string Region { get; set; }
+        public long MaximumAllowedRangeLengthFromBucketInBytes { get; set; }
     }
 }

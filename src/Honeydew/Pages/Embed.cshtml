@@ -1,0 +1,47 @@
+﻿@page "/e/{id}"
+@model Honeydew.Pages.EmbedModel
+@{
+    Layout = null;
+
+    var rawUrl = Url.ActionLink("Raw", "Upload", new { id = Model.Id });
+    var mainUrl = Url.PageLink("Upload", values: new { id = Model.Id });
+
+    ViewData["Title"] = Model.Upload.Name;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <partial name="_HtmlHeadTagsPartial" />
+</head>
+<body>
+    @if (Model.Upload == null || Model.Upload.Status == UploadStatus.Pending)
+    {
+        Response.StatusCode = 404;
+        ViewData["Title"] = "Not Found";
+
+        <div class="my-16 text-center">
+            <h1 class="text-2xl mb-4">Nothing here!</h1>
+            <div class="text-gray-600">This upload is swimmin' with the fishes.</div>
+        </div>
+
+        return;
+    }
+
+    @switch (Model.MediaTypeCategory)
+    {
+        case Models.MediaType.Video:
+
+            <video class="w-full" src="@rawUrl" controls autoplay muted></video>
+
+            break;
+        default:
+
+            <div class="m-8 text-indigo-800">
+                This media type does not support embedding yet. View this upload at <a href="@mainUrl">@mainUrl</a>
+            </div>
+
+            break;
+    }
+</body>
+</html>

@@ -1,4 +1,6 @@
-﻿using Azure;
+﻿using Amazon.Runtime;
+using Azure;
+using Azure.Storage;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
@@ -14,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
@@ -27,7 +30,9 @@ namespace Honeydew.UploadStores
 
         private readonly ILogger _logger;
         private readonly ApplicationDbContext _context;
+
         private BlobContainerClient _blobContainerClient;
+        private long _maximumAllowedDownloadRangeFromBlobStoreInBytes = 16 * 1024 * 1024; // 16MiB
 
         public AzureBlobsStore(
             ApplicationDbContext context,
@@ -59,6 +64,15 @@ namespace Honeydew.UploadStores
                     configValueExamples: new[] { "honeydew", "myazureblobcontainer" });
             }
 
+            if (options.MaximumAllowedRangeLengthFromBlobStoreInBytes < 0)
+            {
+                throw new StorageConfigException(
+                    StorageType.AzureBlobs,
+                    nameof(options.MaximumAllowedRangeLengthFromBlobStoreInBytes),
+                    options.MaximumAllowedRangeLengthFromBlobStoreInBytes.ToString(),
+                    configValueExamples: new[] { "16777216", "0" });
+            }
+
             _blobContainerClient =
                 new BlobContainerClient(
                     options.ConnectionString,
@@ -70,13 +84,52 @@ namespace Honeydew.UploadStores
             return _blobContainerClient.DeleteBlobIfExistsAsync(upload.Id + upload.Extension);
         }
 
-        public override async Task<Stream> DownloadAsync(Upload upload, RangeHeaderValue range, CancellationToken cancellationToken)
+        public override async Task<DownloadResult> DownloadAsync(Upload upload, RangeHeaderValue range, CancellationToken cancellationToken)
         {
             var blob = _blobContainerClient.GetBlobClient(upload.Id + upload.Extension);
 
-            var response = await blob.DownloadAsync(new HttpRange(), cancellationToken: cancellationToken);
+            if (range == null)
+            {
+                return new DownloadResult
+                {
+                    Stream = (await blob.DownloadAsync(cancellationToken)).Value.Content
+                };
+            }
+            else
+            {
+                var offset = range.Ranges.FirstOrDefault()?.From.GetValueOrDefault() ?? 0;
 
-            return response.Value.Content;
+                // Bound the to range to the maximum allowed download range so if the client requests an unbounded range (0-) 
+                // then we don't grab the potentially giant file from the backing store which then has to be relayed to the client.
+                long? length = range.Ranges.FirstOrDefault()?.To;
+
+                if (_maximumAllowedDownloadRangeFromBlobStoreInBytes > 0)
+                {
+                    if (length.HasValue)
+                    {
+                        length = Math.Min(
+                            length.GetValueOrDefault() - offset,
+                            Math.Min(
+                                _maximumAllowedDownloadRangeFromBlobStoreInBytes,
+                                upload.Length - offset));
+                    }
+                    else
+                    {
+                        // Grab the minimum out of the client requested to val
+                        length = Math.Min(
+                            _maximumAllowedDownloadRangeFromBlobStoreInBytes,
+                            upload.Length - offset);
+                    }
+                }
+
+                var response = await blob.DownloadAsync(new HttpRange(offset, length), cancellationToken: cancellationToken);
+
+                return new DownloadResult
+                {
+                    Stream = response.Value.Content,
+                    ContentRange = response.GetRawResponse().Headers.FirstOrDefault(x => x.Name == "Content-Range").Value
+                };
+            }
         }
 
         public override async Task<long> AppendToUploadAsync(Upload upload, Stream stream, CancellationToken cancellationToken)
