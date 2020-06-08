@@ -29,7 +29,6 @@ namespace Honeydew.UploadStores
         public const int blockSize = 1 * 1024 * 1024; // 1 MB
 
         private readonly ILogger _logger;
-        private readonly ApplicationDbContext _context;
 
         private BlobContainerClient _blobContainerClient;
         private long _maximumAllowedDownloadRangeFromBlobStoreInBytes = 16 * 1024 * 1024; // 16MiB
@@ -40,7 +39,6 @@ namespace Honeydew.UploadStores
             ILogger<AzureBlobsStore> logger)
             : base(options, context)
         {
-            _context = context;
             _logger = logger;
         }
 
@@ -195,7 +193,7 @@ namespace Honeydew.UploadStores
                     _logger.LogDebug("Read bytes {bytesRead}, written {bytesWritten}, block number {blockNumber} on file {id}", bytesRead, bytesWritten, upload.BlockNumber, blobName);
 
                     // note: cancellation token *not* supplied as this must finish because we have sucessfully uploaded the latest block to azure.
-                    await _context.SaveChangesAsync();
+                    await DbContext.SaveChangesAsync();
                 } while (bytesRead != 0);
 
                 if (upload.Length == upload.UploadedLength)

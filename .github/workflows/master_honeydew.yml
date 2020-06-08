@@ -1,4 +1,4 @@
-name: deploy
+name: deploy to azure
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - master
 
 jobs:
-  build-and-deploy:
+  deploy-azure-app:
     runs-on: windows-latest
 
     steps:
@@ -18,7 +18,7 @@ jobs:
         dotnet-version: '3.1.102'
 
     - name: dotnet publish
-      run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+      run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/honeydew
 
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v1
@@ -26,4 +26,4 @@ jobs:
         app-name: 'honeydew'
         slot-name: 'production'
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_918096fcb51d4e9d860bf116f8f0717a }}
-        package: ${{env.DOTNET_ROOT}}/myapp 
+        package: ${{env.DOTNET_ROOT}}/honeydew 
