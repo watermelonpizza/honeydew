@@ -21,12 +21,17 @@ jobs:
         node-version: 12
 
     - name: Install dependencies
-      run: dotnet restore
-      run: cd src/Honeydew && npm install
+      run: |
+        dotnet restore
+        cd src/Honeydew
+        npm install
 
     - name: Build
-      run: cd src/Honeydew && npm run build:prod
-      run: dotnet build --configuration Release --no-restore
+      run: |
+        cd src/Honeydew
+        npm run build:prod
+        cd ../
+        dotnet build --configuration Release --no-restore
 
     - name: Test
       run: dotnet test --no-restore --verbosity normal
