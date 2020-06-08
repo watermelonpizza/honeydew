@@ -33,7 +33,7 @@ jobs:
         cd src/Honeydew
         npm run build:prod
         cd ../../
-      run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/honeydew
+        dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/honeydew
 
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v1
