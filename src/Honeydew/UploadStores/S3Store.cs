@@ -24,7 +24,6 @@ namespace Honeydew.UploadStores
         public const int blockSize = 5 * 1024 * 1024; // 5 MB (required smallest block upload size for S3)
 
         private readonly ILogger _logger;
-        private readonly ApplicationDbContext _context;
 
         private IAmazonS3 _s3;
         private string _bucket;
@@ -33,7 +32,6 @@ namespace Honeydew.UploadStores
         public S3Store(ApplicationDbContext context, IOptionsMonitor<S3StoreOptions> options, ILogger<AzureBlobsStore> logger)
             : base(options, context)
         {
-            _context = context;
             _logger = logger;
         }
 
@@ -84,6 +82,7 @@ namespace Honeydew.UploadStores
 
             _s3 = new AmazonS3Client(options.AccessKey, options.SecretAccessKey, RegionEndpoint.GetBySystemName(options.Region));
             _bucket = options.Bucket;
+            _maximumAllowedDownloadRangeFromBucketInBytes = options.MaximumAllowedRangeLengthFromBucketInBytes;
         }
 
         public override async Task<long> AppendToUploadAsync(Upload upload, Stream stream, CancellationToken cancellationToken)
@@ -225,13 +224,41 @@ namespace Honeydew.UploadStores
 
         public override async Task<DownloadResult> DownloadAsync(Upload upload, RangeHeaderValue range, CancellationToken cancellationToken)
         {
-            var request = new GetObjectRequest
+            GetObjectRequest request = new GetObjectRequest
             {
                 BucketName = _bucket,
-                Key = upload.Id + upload.Extension,
-                // TODO: Fix this
-                ByteRange = new ByteRange(range.Ranges.FirstOrDefault()?.From.GetValueOrDefault() ?? 0, range.Ranges.FirstOrDefault()?.To.GetValueOrDefault() ?? 0)
+                Key = upload.Id + upload.Extension
             };
+
+            if (range != null)
+            {
+                var offset = range.Ranges.FirstOrDefault()?.From.GetValueOrDefault() ?? 0;
+
+                // Bound the to range to the maximum allowed download range so if the client requests an unbounded range (0-) 
+                // then we don't grab the potentially giant file from the backing store which then has to be relayed to the client.
+                long? length = range.Ranges.FirstOrDefault()?.To;
+
+                if (_maximumAllowedDownloadRangeFromBucketInBytes > 0)
+                {
+                    if (length.HasValue)
+                    {
+                        length = Math.Min(
+                            length.GetValueOrDefault() - offset,
+                            Math.Min(
+                                _maximumAllowedDownloadRangeFromBucketInBytes,
+                                upload.Length - offset));
+                    }
+                    else
+                    {
+                        // Grab the minimum out of the client requested to val
+                        length = Math.Min(
+                            _maximumAllowedDownloadRangeFromBucketInBytes,
+                            upload.Length - offset);
+                    }
+                }
+
+                request.ByteRange = new ByteRange(offset, offset + length.Value);
+            }
 
             var stream = await _s3.GetObjectAsync(request);
 

@@ -1,5 +1,9 @@
 module.exports = {
-  purge: [],
+  purge: [
+    './**/*.cshtml',
+    './**/*.cs',
+    './**/*.html',
+  ],
   theme: {
     extend: {},
   },

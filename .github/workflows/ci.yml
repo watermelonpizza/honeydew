@@ -9,13 +9,29 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.101
+
+    - name: Setup nodejs
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12
+
     - name: Install dependencies
-      run: dotnet restore
+      run: |
+        dotnet restore
+        cd src/Honeydew
+        npm install
+
     - name: Build
-      run: dotnet build --configuration Release --no-restore
+      run: |
+        cd src/Honeydew
+        npm run build:prod
+        cd ../../
+        dotnet build --configuration Release --no-restore
+
     - name: Test
       run: dotnet test --no-restore --verbosity normal
