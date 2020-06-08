@@ -36,9 +36,8 @@ jobs:
         dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/honeydew
 
     - name: Deploy to Azure Web App
-      uses: azure/webapps-deploy@v1
+      uses: azure/webapps-deploy@v2
       with:
         app-name: 'honeydew'
-        slot-name: 'production'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_918096fcb51d4e9d860bf116f8f0717a }}
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
         package: ${{env.DOTNET_ROOT}}/honeydew 
