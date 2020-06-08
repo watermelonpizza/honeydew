@@ -1,5 +1,5 @@
 ﻿@page
-@model Honeydew.Areas.Identity.Pages.Account.Manage.ApiKeyModel
+@model ApiKeyModel
 @{
     ViewData["Title"] = "API Key";
     ViewData["ActivePage"] = ManageNavPages.ApiKey;
@@ -28,6 +28,6 @@ else
     <div class="alert alert-error mb-4">@Model.ErrorMessage</div>
 }
 
-<form id="download-data" asp-page="ApiKey" method="post" class="form-group">
+<form id="generatge-apikey" asp-page="ApiKey" method="post" class="form-group">
     <button class="btn btn-primary" type="submit">@(Model.ApiToken == null ? "Generate Key" : "Generate New Key")</button>
 </form>

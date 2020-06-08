@@ -1,0 +1,17 @@
+﻿@page
+@model ShareXConfigModel
+@{
+    ViewData["Title"] = "API Key";
+    ViewData["ActivePage"] = ManageNavPages.ShareXConfig;
+}
+
+<h4 class="font-bold">Your ShareX Config file</h4>
+<p class="mb-1">
+    Use this config in ShareX to start uploading straight away.
+</p>
+
+<form id="download-config" asp-page="DownloadConfig" method="post" class="form-group my-4">
+    <button class="btn btn-primary" type="submit">Download ShareX Config</button>
+</form>
+
+<pre class="block rounded bg-gray-200 text-orange-500 my-5 p-2">@Model.ShareXConfig</pre>
