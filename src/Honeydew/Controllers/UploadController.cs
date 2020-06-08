@@ -127,8 +127,12 @@ namespace Honeydew.Controllers
                 new JsonResult(
                     new
                     {
+                        id = upload.Id,
+                        path = Url.Page("/Upload", values: new { id = upload.Id }),
                         url = Url.PageLink("/Upload", values: new { id = upload.Id }),
-                        delete = Url.ActionLink("DeleteUpload", values: new { id = upload.Id })
+                        delete = Url.ActionLink("DeleteUpload", values: new { id = upload.Id }),
+                        raw = Url.ActionLink("Raw", values: new { id = upload.Id }),
+                        download = Url.ActionLink("Download", values: new { id = upload.Id })
                     });
         }
 
