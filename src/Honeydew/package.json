@@ -5,12 +5,13 @@
   "main": "index.js",
   "scripts": {
     "build": "npm run postcss && npm run sass",
-    "build:prod": "npm run postcss && npm run sass --style=compressed",
+    "build:prod": "npm run postcss && npm run sass:min",
     "watch": "concurrently \"npm:watch:*\"",
     "watch:src": "npm run postcss --watch",
     "watch:transform": "npm run sass --watch",
     "postcss": "postcss src/scss/tailwind.scss -o src/scss/tailwind.transform.scss --verbose",
-    "sass": "node node_modules/dart-sass/sass.js src/scss/tailwind.transform.scss wwwroot/css/site.css"
+    "sass": "node node_modules/dart-sass/sass.js src/scss/tailwind.transform.scss wwwroot/css/site.css",
+    "sass:min": "node node_modules/dart-sass/sass.js src/scss/tailwind.transform.scss wwwroot/css/site.min.css --style=compressed"
   },
   "keywords": [],
   "author": "",
