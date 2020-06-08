@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Honeydew.Areas.Identity.Pages.Account
 {
@@ -24,17 +25,20 @@ namespace Honeydew.Areas.Identity.Pages.Account
         private readonly UserManager<User> _userManager;
         private readonly IEmailSender _emailSender;
         private readonly ILogger<ExternalLoginModel> _logger;
+        private readonly IOptionsMonitor<Models.IdentityOptions> _options;
 
         public ExternalLoginModel(
             SignInManager<User> signInManager,
             UserManager<User> userManager,
             ILogger<ExternalLoginModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            IOptionsMonitor<Models.IdentityOptions> options)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _logger = logger;
             _emailSender = emailSender;
+            _options = options;
         }
 
         [BindProperty]
@@ -61,6 +65,11 @@ namespace Honeydew.Areas.Identity.Pages.Account
 
         public IActionResult OnPost(string provider, string returnUrl = null)
         {
+            if (_userManager.Users.Any() && !_options.CurrentValue.AllowRegistration)
+            {
+                return Unauthorized();
+            }
+
             // Request a redirect to the external login provider.
             var redirectUrl = Url.Page("./ExternalLogin", pageHandler: "Callback", values: new { returnUrl });
             var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
@@ -111,6 +120,11 @@ namespace Honeydew.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPostConfirmationAsync(string returnUrl = null)
         {
+            if (_userManager.Users.Any() && !_options.CurrentValue.AllowRegistration)
+            {
+                return Unauthorized();
+            }
+
             returnUrl = returnUrl ?? Url.Content("~/");
             // Get the information about the user from the external login provider
             var info = await _signInManager.GetExternalLoginInfoAsync();

@@ -68,6 +68,7 @@ namespace Honeydew
 
             CreateUploadHandlers(services);
 
+            services.Configure<Models.IdentityOptions>(Configuration.GetSection("Identity"));
             services.Configure<SlugOptions>(Configuration.GetSection("SlugGeneration"));
             services.Configure<DeletionOptions>(Configuration.GetSection("Deletion"));
 
