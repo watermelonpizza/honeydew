@@ -35,6 +35,7 @@ using Honeydew.TusStores;
 using Honeydew.AuthenticationHandlers;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Honeydew.Helpers;
+using System.ComponentModel.DataAnnotations;
 #if DEBUG
 using Westwind.AspNetCore.LiveReload;
 #endif
@@ -56,9 +57,28 @@ namespace Honeydew
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlite(
-                    Configuration.GetConnectionString("DefaultConnection")));
+            var databaseTypeString = Configuration["Database:Type"];
+
+            if (!Enum.TryParse(databaseTypeString, out DatabaseType type))
+            {
+                throw new Exception($"The database type `{databaseTypeString}` is not a valid database type. Valid options are: {string.Join(", ", Enum.GetNames(typeof(DatabaseType)))}");
+            }
+
+            var connectionString = Configuration.GetConnectionString("DefaultConnection");
+
+            switch (type)
+            {
+                case DatabaseType.Sqlite:
+                    services.AddDbContext<ApplicationDbContext, SqliteApplicationDbContext>(options =>
+                        options.UseSqlite(connectionString));
+                    break;
+                case DatabaseType.SqlServer:
+                    services.AddDbContext<ApplicationDbContext, SqlServerApplicationDbContext>(options =>
+                        options.UseSqlServer(connectionString));
+                    break;
+                default:
+                    throw new Exception($"The database type `{databaseTypeString}` is not a valid database type. Valid options are: {string.Join(", ", Enum.GetNames(typeof(DatabaseType)))}");
+            }
 
             services.AddDefaultIdentity<User>(
                     options => options.SignIn.RequireConfirmedAccount = true)
