@@ -20,6 +20,8 @@
     <meta property="og:image" content="@(ViewData["og:image"] ?? Context.Request.Scheme + "://" + Context.Request.Host + Url.Content("~/assets/logo.png"))" />
 
     @await RenderSectionAsync("Head", required: false)
+
+    @Html.Raw(JavaScriptSnippet.FullScript)
 </head>
 <body class="h-screen flex flex-col @(ViewData["BodyClass"] ?? "bg-gray-100")">
     @if (!((ViewData["HideHeader"] is bool hide) && hide))
