@@ -40,12 +40,12 @@ namespace Honeydew.TusStores
             return bytesWrittenThisRequest;
         }
 
-        public Task<string> CreateFileAsync(long uploadLength, string metadata, CancellationToken cancellationToken)
+        public async Task<string> CreateFileAsync(long uploadLength, string metadata, CancellationToken cancellationToken)
         {
             using var scope = _provider.CreateScope();
             var slug = scope.ServiceProvider.GetService<SlugGenerator>();
 
-            return slug.GenerateSlugAsync(cancellationToken);
+            return await slug.GenerateSlugAsync(cancellationToken);
         }
 
         public async Task<bool> FileExistAsync(string fileId, CancellationToken cancellationToken)

@@ -27,6 +27,8 @@ namespace Honeydew.Areas.Identity.Pages.Account
         [BindProperty]
         public InputModel Input { get; set; }
 
+        public bool RememberMe { get; set; }
+
         public string ReturnUrl { get; set; }
 
         public class InputModel
@@ -38,7 +40,7 @@ namespace Honeydew.Areas.Identity.Pages.Account
             public string RecoveryCode { get; set; }
         }
 
-        public async Task<IActionResult> OnGetAsync(string returnUrl = null)
+        public async Task<IActionResult> OnGetAsync(bool rememberMe, string returnUrl = null)
         {
             // Ensure the user has gone through the username & password screen first
             var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
@@ -48,6 +50,7 @@ namespace Honeydew.Areas.Identity.Pages.Account
             }
 
             ReturnUrl = returnUrl;
+            RememberMe = rememberMe;
 
             return Page();
         }

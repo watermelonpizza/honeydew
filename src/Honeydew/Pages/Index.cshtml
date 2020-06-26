@@ -23,17 +23,17 @@
             var link = Url.PageLink("Upload", values: new { id = upload.Id });
             var patchLink = Url.Action("PatchUpload", "Upload", new { id = upload.Id });
 
-            <div class="upload-item p-2 sm:p-4 mx-auto max-w-3xl shadow hover:shadow-lg transform transition-all duration-100 ease-in-out hover:-translate-y-1 rounded bg-white">
+            <div class="upload-item p-2 sm:p-4 mx-auto max-w-3xl shadow hover:shadow-lg transform transition-all duration-100 ease-in-out rounded bg-white">
                 <div class="sm:flex mb-2 sm:mb-4">
-                    <div class="flex-grow form-group @(MediaTypeHelpers.ParseMediaType(upload.MediaType) == MediaType.Text ? "mb-2 sm:mb-0 sm:mr-4" : "")">
-                        <input class="form-input" value="@upload.Name" onchange="updateName(`@patchLink`, this)" autocomplete="off" spellcheck="false" />
-                        <label class="form-attachment">@upload.Extension</label>
+                    <div class="flex flex-grow items-stretch @(MediaTypeHelpers.ParseMediaType(upload.MediaType) == MediaType.Text ? "mb-2 sm:mb-0 sm:mr-4" : "")">
+                        <input class="py-1 px-2 form-input flex-grow text-sm rounded-r-none border-gray-200 focus:border-gray-400 active:border-gray-400 outline-none" value="@upload.Name" onchange="updateName(`@patchLink`, this)" autocomplete="off" spellcheck="false" />
+                        <label class="px-2 flex items-center text-sm border-t border-r border-b rounded rounded-l-none bg-gray-100 text-gray-600">@upload.Extension</label>
                     </div>
 
                     @if (MediaTypeHelpers.ParseMediaType(upload.MediaType) == MediaType.Text)
                     {
                         <div>
-                            <select class="sm:w-full form-select mr-2 sm:mr-0 sm:mb-2"
+                            <select class="sm:w-full form-select py-1 px-2 mr-2 text-sm sm:mr-0"
                                     name="CodeLanguage"
                                     asp-items="CodeLanguageHelpers.GetLanguages(upload.CodeLanguage)"
                                     onchange="updateCodeLanguage(`@patchLink`, this)">

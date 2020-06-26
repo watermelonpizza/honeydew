@@ -178,9 +178,13 @@ namespace Honeydew.Controllers
 
             var userId = _userManager.GetUserId(User);
 
+            var now = DateTimeOffset.UtcNow;
+
             var upload = await _context.Uploads
                 .FirstOrDefaultAsync(
-                    x => x.Id == id && x.UserId == userId && x.PendingForDeletionAt == null,
+                    x => x.Id == id
+                    && x.UserId == userId
+                    && (x.PendingForDeletionAt == null || x.PendingForDeletionAt >= now),
                     Request.HttpContext.RequestAborted);
 
             if (upload == null)
@@ -205,7 +209,7 @@ namespace Honeydew.Controllers
                 }
                 else
                 {
-                    upload.PendingForDeletionAt = DateTimeOffset.UtcNow.AddSeconds(_deletionOptions.CurrentValue.DeleteSecondsAfterMarked);
+                    upload.PendingForDeletionAt = now.AddSeconds(_deletionOptions.CurrentValue.DeleteSecondsAfterMarked);
                 }
             }
 

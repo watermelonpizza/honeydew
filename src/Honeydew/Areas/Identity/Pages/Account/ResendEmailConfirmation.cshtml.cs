@@ -15,7 +15,7 @@ using Microsoft.AspNetCore.WebUtilities;
 namespace Honeydew.Areas.Identity.Pages.Account
 {
     [AllowAnonymous]
-    public abstract class ResendEmailConfirmationModel : PageModel
+    public class ResendEmailConfirmationModel : PageModel
     {
         private readonly UserManager<User> _userManager;
         private readonly IEmailSender _emailSender;

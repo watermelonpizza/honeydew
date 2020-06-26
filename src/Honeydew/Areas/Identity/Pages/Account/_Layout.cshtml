@@ -1,0 +1,17 @@
+﻿@{
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+    ViewData["HideHeader"] = true;
+    ViewData["BodyClass"] = "bg-purple-900";
+}
+
+<div class="md:max-w-md md:mx-auto mt-8 md:mt-12">
+    <h1 class="flex justify-center text-3xl text-white font-light mb-8 md:mb-12 uppercase">@ViewData["Title"]</h1>
+
+    <div class="p-4 md:p-8 md:rounded md:shadow-lg bg-white">
+        @RenderBody()
+    </div>
+</div>
+
+@section Scripts {
+    @RenderSection("Scripts", required: false)
+}

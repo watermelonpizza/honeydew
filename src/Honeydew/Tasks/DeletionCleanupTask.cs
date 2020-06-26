@@ -67,7 +67,11 @@ namespace Honeydew.Tasks
 
             var now = DateTimeOffset.UtcNow;
 
-            var toDelete = await context.Uploads.Where(x => x.PendingForDeletionAt <= now).ToArrayAsync();
+            var toDelete =
+                await context.Uploads
+                    .Where(x => x.PendingForDeletionAt <= now)
+                    .ToArrayAsync();
+
             var deletedCount = 0;
 
             foreach (var upload in toDelete)

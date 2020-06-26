@@ -1,22 +1,15 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.EntityFrameworkCore;
 using Honeydew.Data;
-using Honeydew.Exceptions;
 using Honeydew.Models;
 using Honeydew.UploadStores;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
@@ -25,7 +18,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using tusdotnet;
 using tusdotnet.Constants;
-using tusdotnet.Interfaces;
 using tusdotnet.Models;
 using tusdotnet.Models.Configuration;
 using tusdotnet.Models.Expiration;
@@ -33,12 +25,8 @@ using tusdotnet.Models.Concatenation;
 using Honeydew.Tasks;
 using Honeydew.TusStores;
 using Honeydew.AuthenticationHandlers;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Honeydew.Helpers;
-using System.ComponentModel.DataAnnotations;
-#if DEBUG
-using Westwind.AspNetCore.LiveReload;
-#endif
+using System.Text.RegularExpressions;
 
 namespace Honeydew
 {
@@ -99,12 +87,14 @@ namespace Honeydew
                     TokenAuthenticationHandler.TokenAuthenticationSchemeName,
                     options => { });
 
-            var builder = services.AddRazorPages();
+            var builder = services.AddRazorPages(options =>
+            {
+                options.Conventions.Add(new PageRouteTransformerConvention(new SlugifyParameterTransformer()));
+            });
 
 #if DEBUG
             if (Environment.IsDevelopment())
             {
-                //services.AddLiveReload();
                 builder.AddRazorRuntimeCompilation();
             }
 #endif
@@ -123,10 +113,6 @@ namespace Honeydew
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
                 app.UseStatusCodePages();
-
-#if DEBUG
-                //app.UseLiveReload();
-#endif
             }
             else
             {
@@ -150,6 +136,15 @@ namespace Honeydew
                 endpoints.MapRazorPages();
                 endpoints.MapControllers();
             });
+        }
+
+        public class SlugifyParameterTransformer : IOutboundParameterTransformer
+        {
+            public string TransformOutbound(object value)
+            {
+                // Slugify value
+                return value == null ? null : Regex.Replace(value.ToString(), "([a-z])([A-Z])", "$1-$2").ToLower();
+            }
         }
 
         private void CreateUploadHandlers(IServiceCollection services)

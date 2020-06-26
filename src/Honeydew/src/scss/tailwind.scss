@@ -6,6 +6,10 @@
   min-height: theme('height.16');
 }
 
+p ~ p {
+  @apply mt-4;
+}
+
 a,
 .link {
   @apply text-purple-500;
@@ -44,26 +48,31 @@ header {
   }
 }
 
-.form-input,
-.form-select {
-  @apply block w-full h-8 px-2 py-0 text-sm;
-}
-
 .form-group {
-  @apply flex mb-4;
+  @apply block;
 
-  .form-input {
-    @apply border-r-0 rounded-r-none border-gray-200;
-    outline: none !important;
-
-    &:focus,
-    &:active {
-      @apply border-gray-400;
-    }
+  & ~ .form-group {
+    @apply mt-4;
   }
 
-  .form-attachment {
-    @apply h-8 px-2 flex items-center text-sm border-t border-r border-b rounded rounded-l-none bg-gray-100 text-gray-600;
+  .form-label {
+    @apply font-semibold text-gray-700;
+  }
+
+  .form-input {
+    @apply mt-1 block w-full;
+  }
+
+  .form-text {
+    @apply block text-sm mt-2 text-gray-600;
+  }
+
+  .input-validation-error {
+    @apply border border-red-500;
+  }
+
+  .field-validation-error {
+    @apply block text-sm mt-2 text-red-500;
   }
 }
 
@@ -89,6 +98,11 @@ header {
   &.alert-error {
     @apply bg-red-100 border-red-500 text-red-700;
   }
+}
+
+.validation-summary-errors {
+  @extend .alert, .alert-error;
+  @apply mt-0 mb-6;
 }
 
 @tailwind utilities;

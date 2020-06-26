@@ -16,11 +16,11 @@ using Newtonsoft.Json;
 
 namespace Honeydew.Areas.Identity.Pages.Account.Manage
 {
-    public class ShareXConfigModel : PageModel
+    public class SharexConfigModel : PageModel
     {
         private readonly UserManager<User> _userManager;
 
-        public ShareXConfigModel(UserManager<User> userManager)
+        public SharexConfigModel(UserManager<User> userManager)
         {
             _userManager = userManager;
         }
