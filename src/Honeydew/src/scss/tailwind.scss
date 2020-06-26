@@ -10,6 +10,10 @@ p ~ p {
   @apply mt-4;
 }
 
+code {
+  @apply text-sm text-red-700 bg-gray-200 p-1;
+}
+
 a,
 .link {
   @apply text-purple-500;
@@ -236,4 +240,13 @@ $background-item: linear-gradient(45deg, $color1 25%, transparent 25%, transpare
   background-image: $background-item;
   background-size: $size $size;
   background-position: 0 0, $size/2 $size/2;
+}
+
+.error-code {
+  @apply font-bold font-mono;
+  font-size: 8rem;
+
+  @screen md {
+    font-size: 14rem;
+  }
 }

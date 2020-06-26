@@ -1,15 +1,55 @@
 ﻿@page
 @model ErrorModel
 @{
-    ViewData["Title"] = "Error";
+    ViewData["HideHeader"] = true;
 }
 
-<h1 class="text-red-500 text-lg">Error.</h1>
-<h2 class="text-red-500">An error occurred while processing your request.</h2>
+<div class="m-4 lg:mx-auto md:mt-16 max-w-4xl">
+    @if (Model.IsNotFound)
+    {
+        ViewData["Title"] = "Not Found";
 
-@if (Model.ShowRequestId)
-{
-    <p>
-        <strong>Request ID:</strong> <code>@Model.RequestId</code>
+        <div class="flex items-center">
+            <h1 class="text-purple-600 error-code">404</h1>
+            <div class="ml-12 text-2xl font-bold text-purple-400">
+                Oops! You appear to be lost.
+            </div>
+        </div>
+    }
+    else if (Model.TargetStatusCode == 200)
+    {
+        ViewData["Title"] = "You found the error page!";
+
+        <div class="md:flex items-center">
+            <h1 class="text-green-600 error-code">@Model.TargetStatusCode</h1>
+            <div class="md:ml-12 text-2xl font-bold text-green-400">
+                Congrats! You found the error page! 🎉 Except there is no error right now so I don't know why you are here.
+            </div>
+        </div>
+    }
+    else
+    {
+        ViewData["Title"] = "Error";
+
+        <div class="md:flex items-center">
+            <h1 class="text-red-600 error-code">@Model.TargetStatusCode</h1>
+            <div class="md:ml-12 text-2xl font-bold text-red-400">
+                An error occurred while processing your request.
+                <br />
+                Sorry :(
+            </div>
+        </div>
+
+        @if (Model.ShowRequestId)
+        {
+            <p class="mt-8 md:mt-0 flex flex-col md:flex-row md:items-center">
+                <strong class="mr-2 mb-2 md:mb-0">Request ID</strong>
+                <code>@Model.RequestId</code>
+            </p>
+        }
+    }
+
+    <p class="mt-8 flex md:block items-center justify-center">
+        <a class="text-2xl" asp-page="/Index">Go home</a>
     </p>
-}
+</div>

@@ -27,6 +27,7 @@ using Honeydew.TusStores;
 using Honeydew.AuthenticationHandlers;
 using Honeydew.Helpers;
 using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Http;
 
 namespace Honeydew
 {
@@ -87,6 +88,11 @@ namespace Honeydew
                     TokenAuthenticationHandler.TokenAuthenticationSchemeName,
                     options => { });
 
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = new PathString("/identity/account/login");
+            });
+
             var builder = services.AddRazorPages(options =>
             {
                 options.Conventions.Add(new PageRouteTransformerConvention(new SlugifyParameterTransformer()));
@@ -112,14 +118,15 @@ namespace Honeydew
             {
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
-                app.UseStatusCodePages();
             }
             else
             {
-                app.UseExceptionHandler("/Error");
+                app.UseExceptionHandler("/error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            app.UseStatusCodePagesWithReExecute("/error", "?code={0}");
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
